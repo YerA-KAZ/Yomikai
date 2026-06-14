@@ -2,14 +2,14 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import MainLayout from './widgets/Layout/MainLayout';
 import HomePage from './pages/HomePage';
-import HiraganaPage from './pages/HiraganaPage';
-import KatakanaPage from './pages/KatakanaPage';
+import AlphabetPage from './pages/AlphabetPage';
 import KanjiPage from './pages/KanjiPage';
 import DictionaryPage from './pages/DictionaryPage';
 import PracticePage from './pages/PracticePage';
 import TestsPage from './pages/TestsPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 
 // Configure App Router mapping endpoints to FSD layers
 const router = createBrowserRouter([
@@ -22,12 +22,20 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+        path: 'alphabet/:tab?',
+        element: <AlphabetPage />,
+      },
+      {
         path: 'hiragana',
-        element: <HiraganaPage />,
+        element: <AlphabetPage defaultTab="hiragana" />,
       },
       {
         path: 'katakana',
-        element: <KatakanaPage />,
+        element: <AlphabetPage defaultTab="katakana" />,
+      },
+      {
+        path: 'leaderboard',
+        element: <LeaderboardPage />,
       },
       {
         path: 'kanji',

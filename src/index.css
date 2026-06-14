@@ -1,7 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 
 /* Google Font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
 
 /* TailwindCSS v4 Theme Configuration */
 @theme {
@@ -23,12 +23,55 @@
   --color-border: var(--theme-border);
   --color-glass: var(--theme-glass);
   --color-glass-border: var(--theme-glass-border);
+
+  /* Animation definitions */
+  --animate-shimmer: shimmer 2s infinite linear;
+  --animate-pulse-subtle: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes shimmer {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 10px -2px var(--theme-primary);
+    }
+    to {
+      box-shadow: 0 0 20px 2px var(--theme-primary);
+    }
+  }
+  @keyframes float {
+    0% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(2deg);
+    }
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+  }
 }
 
 /* ===== CAT THEME - LIGHT ===== */
 :root,
 .cat-theme.light {
   --theme-primary: #FF8C00;
+  --theme-primary-rgb: 255, 140, 0;
   --theme-primary-light: #FFB347;
   --theme-primary-dark: #E07B00;
   --theme-accent: #FF6B35;
@@ -42,12 +85,13 @@
   --theme-text-muted: #8A8AAA;
   --theme-border: rgba(255, 140, 0, 0.15);
   --theme-glass: rgba(255, 255, 255, 0.7);
-  --theme-glass-border: rgba(255, 255, 255, 0.3);
+  --theme-glass-border: rgba(255, 255, 255, 0.4);
 }
 
 /* ===== CAT THEME - DARK ===== */
 .cat-theme.dark {
   --theme-primary: #FF8C00;
+  --theme-primary-rgb: 255, 140, 0;
   --theme-primary-light: #FFB347;
   --theme-primary-dark: #CC7000;
   --theme-accent: #FF6B35;
@@ -60,13 +104,14 @@
   --theme-text-secondary: #B0B0C8;
   --theme-text-muted: #707088;
   --theme-border: rgba(255, 140, 0, 0.2);
-  --theme-glass: rgba(30, 30, 46, 0.7);
-  --theme-glass-border: rgba(255, 140, 0, 0.15);
+  --theme-glass: rgba(30, 30, 46, 0.8);
+  --theme-glass-border: rgba(255, 140, 0, 0.2);
 }
 
 /* ===== DOG THEME - LIGHT ===== */
 .dog-theme.light {
   --theme-primary: #6BB5E0;
+  --theme-primary-rgb: 107, 181, 224;
   --theme-primary-light: #A3D5F0;
   --theme-primary-dark: #4A9BC8;
   --theme-accent: #D4A574;
@@ -80,12 +125,13 @@
   --theme-text-muted: #8AAABB;
   --theme-border: rgba(107, 181, 224, 0.15);
   --theme-glass: rgba(255, 255, 255, 0.7);
-  --theme-glass-border: rgba(255, 255, 255, 0.3);
+  --theme-glass-border: rgba(255, 255, 255, 0.4);
 }
 
 /* ===== DOG THEME - DARK ===== */
 .dog-theme.dark {
   --theme-primary: #6BB5E0;
+  --theme-primary-rgb: 107, 181, 224;
   --theme-primary-light: #A3D5F0;
   --theme-primary-dark: #4A9BC8;
   --theme-accent: #D4A574;
@@ -98,14 +144,12 @@
   --theme-text-secondary: #A8C0D0;
   --theme-text-muted: #688898;
   --theme-border: rgba(107, 181, 224, 0.2);
-  --theme-glass: rgba(26, 37, 53, 0.7);
-  --theme-glass-border: rgba(107, 181, 224, 0.15);
+  --theme-glass: rgba(26, 37, 53, 0.8);
+  --theme-glass-border: rgba(107, 181, 224, 0.2);
 }
 
 /* ===== BASE STYLES ===== */
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
@@ -114,6 +158,7 @@ html {
 }
 
 body {
+  margin: 0;
   font-family: var(--font-sans);
   background-color: var(--theme-bg);
   color: var(--theme-text);
@@ -137,14 +182,16 @@ body {
 /* Glass effect utility */
 .glass {
   background: var(--theme-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--theme-glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -160,6 +207,14 @@ body {
   background: var(--theme-text-secondary);
 }
 
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Pet cursor */
 .pet-cursor {
   cursor: url('/cursors/paw-cursor.svg') 16 16, pointer;
@@ -168,6 +223,21 @@ body {
 /* Text utilities */
 .font-jp {
   font-family: var(--font-jp);
+}
+
+/* 3D utilities for card flip */
+.perspective {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }
 
 /* Smooth transitions for theme switching */

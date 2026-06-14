@@ -25,76 +25,104 @@ export const StatsCard: React.FC<StatsCardProps> = ({ stats }) => {
     return `${hours}ч ${mins}м`;
   };
 
-  // Find max minutes to scale chart heights proportionally
+  // Calculate metrics for chart
   const maxWeeklyMinutes = Math.max(...stats.weeklyActivity.map((day) => day.minutes), 10);
+  const totalWeeklyMinutes = stats.weeklyActivity.reduce((acc, curr) => acc + curr.minutes, 0);
+  const avgMinutes = Math.round(totalWeeklyMinutes / stats.weeklyActivity.length);
+  const avgHeightPercentage = Math.max((avgMinutes / maxWeeklyMinutes) * 100, 5);
 
   return (
     <Card hoverable className="p-5 flex flex-col gap-6">
-      <h3 className="text-lg font-bold text-text">Статистика</h3>
+      <h3 className="text-lg font-bold text-text">Общая статистика</h3>
 
       {/* Grid of micro cards */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-bg-secondary/40 border border-border/10 p-3 rounded-2xl flex items-center gap-3">
-          <div className="text-primary bg-primary/10 p-2 rounded-xl">
+        <div className="bg-bg-secondary/60 border border-border/10 p-3.5 rounded-2xl flex items-center gap-3 transition-colors hover:bg-surface-hover/50">
+          <div className="text-amber-500 bg-amber-500/10 p-2 rounded-xl shadow-inner">
             <Award className="w-5 h-5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-text-muted uppercase">Всего XP</span>
-            <span className="text-base font-extrabold text-text">{stats.totalXp} XP</span>
+            <span className="text-[9px] font-extrabold text-text-muted uppercase tracking-wider">Всего опыта</span>
+            <span className="text-base font-black text-text">{stats.totalXp} XP</span>
           </div>
         </div>
 
-        <div className="bg-bg-secondary/40 border border-border/10 p-3 rounded-2xl flex items-center gap-3">
-          <div className="text-primary bg-primary/10 p-2 rounded-xl">
+        <div className="bg-bg-secondary/60 border border-border/10 p-3.5 rounded-2xl flex items-center gap-3 transition-colors hover:bg-surface-hover/50">
+          <div className="text-primary bg-primary/10 p-2 rounded-xl shadow-inner">
             <Flame className="w-5 h-5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-text-muted uppercase">Дней учебы</span>
-            <span className="text-base font-extrabold text-text">{stats.studyDays} дн</span>
+            <span className="text-[9px] font-extrabold text-text-muted uppercase tracking-wider">Дней учебы</span>
+            <span className="text-base font-black text-text">{stats.studyDays} дн</span>
           </div>
         </div>
 
-        <div className="bg-bg-secondary/40 border border-border/10 p-3 rounded-2xl flex items-center gap-3">
-          <div className="text-primary bg-primary/10 p-2 rounded-xl">
+        <div className="bg-bg-secondary/60 border border-border/10 p-3.5 rounded-2xl flex items-center gap-3 transition-colors hover:bg-surface-hover/50">
+          <div className="text-emerald-500 bg-emerald-500/10 p-2 rounded-xl shadow-inner">
             <BookOpen className="w-5 h-5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-text-muted uppercase">Слов выучено</span>
-            <span className="text-base font-extrabold text-text">{stats.wordsLearned}</span>
+            <span className="text-[9px] font-extrabold text-text-muted uppercase tracking-wider">Слов выучено</span>
+            <span className="text-base font-black text-text">{stats.wordsLearned}</span>
           </div>
         </div>
 
-        <div className="bg-bg-secondary/40 border border-border/10 p-3 rounded-2xl flex items-center gap-3">
-          <div className="text-primary bg-primary/10 p-2 rounded-xl">
+        <div className="bg-bg-secondary/60 border border-border/10 p-3.5 rounded-2xl flex items-center gap-3 transition-colors hover:bg-surface-hover/50">
+          <div className="text-blue-500 bg-blue-500/10 p-2 rounded-xl shadow-inner">
             <Clock className="w-5 h-5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-text-muted uppercase">Время учебы</span>
-            <span className="text-base font-extrabold text-text">{formatTime(stats.totalStudyTime)}</span>
+            <span className="text-[9px] font-extrabold text-text-muted uppercase tracking-wider">Время за всё время</span>
+            <span className="text-base font-black text-text">{formatTime(stats.totalStudyTime)}</span>
           </div>
         </div>
       </div>
 
       {/* Weekly activity chart */}
       <div className="flex flex-col gap-3">
-        <span className="text-xs uppercase font-bold tracking-wider text-text-muted">Активность за неделю</span>
-        <div className="flex justify-between items-end h-[100px] bg-bg-secondary/20 border border-border/5 p-4 rounded-2xl mt-1">
+        <div className="flex justify-between items-center">
+          <span className="text-xs font-bold text-text-secondary">Активность за неделю</span>
+          <span className="text-[10px] font-bold text-text-muted bg-bg-secondary px-2 py-0.5 rounded-md">
+            В среднем {avgMinutes} мин/день
+          </span>
+        </div>
+        
+        <div className="relative flex justify-between items-end h-[120px] bg-surface/40 border border-border/10 p-4 rounded-2xl mt-1 overflow-hidden">
+          
+          {/* Average Line */}
+          <div 
+            className="absolute left-0 right-0 border-t border-dashed border-text-muted/30 z-0 flex items-center pointer-events-none"
+            style={{ bottom: `calc(${avgHeightPercentage}% + 1rem)` }}
+          >
+            <span className="absolute -top-3 left-2 text-[8px] font-bold text-text-muted/60">СРЕДНЕЕ</span>
+          </div>
+
           {stats.weeklyActivity.map((day, idx) => {
             const heightPercentage = Math.max((day.minutes / maxWeeklyMinutes) * 100, 8);
+            const isToday = idx === 5; // Hardcoded Saturday for mock data
+            
             return (
-              <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1">
+              <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1 z-10">
                 <div className="group relative w-full flex justify-center">
-                  <span className="absolute bottom-full mb-1 bg-surface border border-border px-1.5 py-0.5 rounded-lg text-[9px] font-bold text-text opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-sm">
-                    {day.minutes} мин
+                  <span className="absolute bottom-full mb-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <div className="bg-surface border border-border px-2 py-1 rounded-lg text-[10px] font-bold text-text shadow-md whitespace-nowrap">
+                      {day.minutes} мин
+                    </div>
                   </span>
                   <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: `${heightPercentage}%` }}
-                    transition={{ delay: idx * 0.05, duration: 0.6, ease: 'easeOut' }}
-                    className="w-4 rounded-full bg-gradient-to-t from-primary to-accent shadow-[0_0_6px_rgba(var(--theme-primary),0.2)]"
+                    transition={{ delay: idx * 0.05, duration: 0.6, ease: 'easeOut', type: 'spring', stiffness: 100 }}
+                    className={`w-6 sm:w-8 rounded-t-md rounded-b-sm shadow-[0_-2px_10px_rgba(var(--theme-primary-rgb),0.1)] transition-colors cursor-pointer hover:brightness-110 ${
+                      isToday 
+                        ? 'bg-gradient-to-t from-primary/80 to-accent' 
+                        : 'bg-primary/20 hover:bg-primary/40'
+                    }`}
                   />
                 </div>
-                <span className="text-[9px] font-bold text-text-muted">{day.day}</span>
+                <span className={`text-[9px] font-bold ${isToday ? 'text-primary' : 'text-text-muted'}`}>
+                  {day.day}
+                </span>
               </div>
             );
           })}

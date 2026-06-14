@@ -21,27 +21,59 @@ export const PracticePage: React.FC = () => {
       .catch((err) => console.error(err));
   }, []);
 
-  const getPracticeIcon = (type: string) => {
-    const iconClass = 'w-6 h-6 text-primary';
+  const getPracticeConfig = (type: string) => {
     switch (type) {
       case 'flashcards':
-        return <Layers className={iconClass} />;
+        return { 
+          icon: <Layers className="w-8 h-8 text-white drop-shadow-md" />, 
+          gradient: 'from-blue-500/20 to-blue-600/5', 
+          iconBg: 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30',
+          borderColor: 'border-blue-500/20 hover:border-blue-500/50'
+        };
       case 'writing':
-        return <PenTool className={iconClass} />;
+        return { 
+          icon: <PenTool className="w-8 h-8 text-white drop-shadow-md" />, 
+          gradient: 'from-amber-500/20 to-amber-600/5', 
+          iconBg: 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30',
+          borderColor: 'border-amber-500/20 hover:border-amber-500/50'
+        };
       case 'matching':
-        return <Puzzle className={iconClass} />;
+        return { 
+          icon: <Puzzle className="w-8 h-8 text-white drop-shadow-md" />, 
+          gradient: 'from-emerald-500/20 to-emerald-600/5', 
+          iconBg: 'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30',
+          borderColor: 'border-emerald-500/20 hover:border-emerald-500/50'
+        };
       case 'quiz':
-        return <HelpCircle className={iconClass} />;
+        return { 
+          icon: <HelpCircle className="w-8 h-8 text-white drop-shadow-md" />, 
+          gradient: 'from-purple-500/20 to-purple-600/5', 
+          iconBg: 'bg-gradient-to-br from-purple-400 to-purple-600 shadow-purple-500/30',
+          borderColor: 'border-purple-500/20 hover:border-purple-500/50'
+        };
       default:
-        return <Sparkles className={iconClass} />;
+        return { 
+          icon: <Sparkles className="w-8 h-8 text-white drop-shadow-md" />, 
+          gradient: 'from-primary/20 to-accent/5', 
+          iconBg: 'bg-gradient-to-br from-primary to-accent shadow-primary/30',
+          borderColor: 'border-primary/20 hover:border-primary/50'
+        };
     }
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-6 py-6 items-center justify-center min-h-[400px]">
-        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        <span className="text-text-muted font-bold text-sm">Загрузка режимов практики...</span>
+      <div className="flex flex-col gap-6 py-4 md:py-6 w-full">
+        <div className="h-[100px] bg-surface/50 border border-border/10 rounded-3xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-[200%] animate-shimmer" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-[240px] bg-surface/50 border border-border/10 rounded-3xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-[200%] animate-shimmer" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -49,9 +81,9 @@ export const PracticePage: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 py-4 md:py-6 text-text">
       {/* Header Info */}
-      <div className="flex flex-col bg-surface/30 border border-border/10 p-5 rounded-3xl backdrop-blur-md">
+      <div className="flex flex-col glass border border-border/10 p-5 rounded-3xl">
         <div className="flex items-center gap-2">
-          <h1 className="text-3xl font-extrabold">Практика</h1>
+          <h1 className="text-3xl font-extrabold drop-shadow-sm">Практика</h1>
           <Badge variant="info" className="font-bold">練習</Badge>
         </div>
         <p className="text-text-secondary text-sm font-medium mt-1">
@@ -60,9 +92,11 @@ export const PracticePage: React.FC = () => {
       </div>
 
       {/* Grid List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
         {sessions.map((session, idx) => {
           const progressPercentage = Math.round((session.completedCount / session.itemCount) * 100);
+          const config = getPracticeConfig(session.type);
+
           return (
             <motion.div
               key={session.id}
@@ -70,42 +104,55 @@ export const PracticePage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
             >
-              <Card hoverable className="p-6 flex flex-col justify-between h-[240px]">
+              <Card 
+                hoverable 
+                className={`p-5 sm:p-6 flex flex-col gap-5 min-h-[280px] h-full relative overflow-hidden group bg-gradient-to-br border transition-colors ${config.gradient} ${config.borderColor}`}
+              >
+                {/* Decorative background icon */}
+                <div className="absolute -right-6 -top-6 text-white/5 group-hover:text-white/10 transition-colors pointer-events-none transform group-hover:scale-110 duration-500">
+                   {React.cloneElement(config.icon as React.ReactElement<{className?: string}>, { className: 'w-48 h-48 drop-shadow-none' })}
+                </div>
+
                 {/* Header info */}
-                <div className="flex justify-between items-start">
-                  <div className="flex gap-4">
-                    <div className="bg-primary/10 border border-primary/20 p-3.5 rounded-2xl flex-shrink-0 shadow-sm">
-                      {getPracticeIcon(session.type)}
+                <div className="flex justify-between items-start relative z-10">
+                  <div className="flex gap-4 min-w-0">
+                    <div className={`p-4 rounded-2xl flex-shrink-0 shadow-lg ${config.iconBg} transform group-hover:-translate-y-1 transition-transform`}>
+                      {config.icon}
                     </div>
-                    <div className="flex flex-col min-w-0">
-                      <h3 className="text-lg font-bold text-text truncate">{session.title}</h3>
-                      <span className="text-xs text-text-secondary mt-1 line-clamp-2 leading-relaxed">{session.description}</span>
+                    <div className="flex flex-col min-w-0 pt-1">
+                      <h3 className="text-xl font-black text-text truncate group-hover:text-primary transition-colors">{session.title}</h3>
+                      <span className="text-xs text-text-secondary mt-1 leading-snug line-clamp-3">{session.description}</span>
                     </div>
                   </div>
-                  <Badge variant="default" className="text-[10px] font-bold shrink-0">
-                    Точность: {session.accuracy}%
-                  </Badge>
                 </div>
 
-                {/* Progress bar info */}
-                <div className="flex flex-col gap-1.5 mt-3">
-                  <div className="flex justify-between items-center text-xs font-bold text-text-secondary">
-                    <span>Выполнено символов/слов</span>
-                    <span className="text-text">{session.completedCount} / {session.itemCount} ({progressPercentage}%)</span>
+                <div className="flex flex-col gap-4 mt-auto relative z-10">
+                  {/* Stats Row */}
+                  <div className="flex flex-wrap justify-between items-center gap-3">
+                    <Badge variant="default" className="text-[10px] font-black uppercase tracking-wider bg-surface/80 backdrop-blur-sm">
+                      Точность: {session.accuracy}%
+                    </Badge>
+                    <div className="text-[10px] font-bold text-text-secondary bg-bg-secondary/50 px-2 py-1 rounded-md border border-border/10">
+                      {session.completedCount} / {session.itemCount} ({progressPercentage}%)
+                    </div>
                   </div>
-                  <ProgressBar value={session.completedCount} max={session.itemCount} height="sm" />
-                </div>
 
-                {/* Play button CTA */}
-                <div className="flex justify-end mt-4">
-                  <Button
-                    variant="secondary"
-                    size="md"
-                    className="flex items-center gap-1.5 rounded-xl text-xs font-bold border-primary/20 hover:border-primary/45"
-                    onClick={() => alert(`Режим «${session.title}» будет доступен в следующем обновлении!`)}
-                  >
-                    Запустить <ArrowRight className="w-3.5 h-3.5" />
-                  </Button>
+                  {/* Progress bar */}
+                  <div className="bg-surface/50 p-2 rounded-xl border border-border/10 backdrop-blur-sm shadow-inner">
+                    <ProgressBar value={session.completedCount} max={session.itemCount} height="sm" />
+                  </div>
+
+                  {/* Play button CTA */}
+                  <div className="flex justify-end">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="w-full sm:w-auto flex items-center gap-1.5 rounded-xl text-xs font-black shadow-lg hover:scale-105"
+                      onClick={() => alert(`Режим «${session.title}» будет доступен в следующем обновлении!`)}
+                    >
+                      Старт <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </Card>
             </motion.div>

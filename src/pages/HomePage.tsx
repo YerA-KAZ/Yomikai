@@ -2,11 +2,9 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUserStore } from '../features/user/useUserStore';
 import { WelcomeCard } from '../widgets/Dashboard/WelcomeCard';
-import { ProgressCard } from '../widgets/Dashboard/ProgressCard';
 import { StreakCard } from '../widgets/Dashboard/StreakCard';
 import { DailyGoalCard } from '../widgets/Dashboard/DailyGoalCard';
 import { RecentLessons } from '../widgets/Dashboard/RecentLessons';
-import { AchievementsCard } from '../widgets/Dashboard/AchievementsCard';
 import { StatsCard } from '../widgets/Dashboard/StatsCard';
 
 export const HomePage: React.FC = () => {
@@ -19,16 +17,35 @@ export const HomePage: React.FC = () => {
 
   if (isLoading && !user) {
     return (
-      <div className="flex flex-col gap-6 py-6 animate-pulse">
+      <div className="flex flex-col gap-6 py-4 md:py-6 w-full">
         {/* Welcome Skeleton */}
-        <div className="h-32 bg-surface/50 border border-border/10 rounded-3xl" />
+        <div className="h-32 bg-surface/50 border border-border/10 rounded-[2rem] relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-[200%] animate-shimmer" />
+        </div>
+        
+        {/* Recent Lessons Skeleton (Full Width) */}
+        <div className="h-[260px] bg-surface/50 border border-border/10 rounded-3xl relative overflow-hidden w-full">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-[200%] animate-shimmer" />
+        </div>
         
         {/* Grid Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="h-44 bg-surface/50 border border-border/10 rounded-3xl" />
-          <div className="h-44 bg-surface/50 border border-border/10 rounded-3xl" />
-          <div className="h-44 bg-surface/50 border border-border/10 rounded-3xl" />
-          <div className="h-44 bg-surface/50 border border-border/10 rounded-3xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Stats Card Skeleton (2/3) */}
+          <div className="lg:col-span-2">
+            <div className="h-[380px] bg-surface/50 border border-border/10 rounded-3xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-[200%] animate-shimmer" />
+            </div>
+          </div>
+          
+          {/* Streak & Daily Goal Skeletons (1/3) */}
+          <div className="flex flex-col gap-6">
+            <div className="h-[200px] bg-surface/50 border border-border/10 rounded-3xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-[200%] animate-shimmer" />
+            </div>
+            <div className="h-[150px] bg-surface/50 border border-border/10 rounded-3xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-[200%] animate-shimmer" />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -45,7 +62,7 @@ export const HomePage: React.FC = () => {
             fetchUser();
             fetchStats();
           }}
-          className="bg-primary text-white font-bold px-6 py-2.5 rounded-2xl hover:bg-primary-dark transition-colors"
+          className="bg-primary text-white font-bold px-6 py-2.5 rounded-2xl hover:bg-primary-dark transition-colors shadow-lg"
         >
           Повторить попытку
         </button>
@@ -67,8 +84,8 @@ export const HomePage: React.FC = () => {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring' as any, stiffness: 260, damping: 25 } },
+    hidden: { opacity: 0, y: 30, scale: 0.98 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 260, damping: 25 } },
   };
 
   return (
@@ -83,14 +100,15 @@ export const HomePage: React.FC = () => {
         <WelcomeCard userName={user.name} level={user.level} />
       </motion.div>
 
+      {/* Recent Lessons (Full Width) */}
+      <motion.div variants={itemVariants} className="w-full">
+        <RecentLessons lessons={user.recentLessons} />
+      </motion.div>
+
       {/* Main Grid content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Col (2/3 width on large screens) */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          <motion.div variants={itemVariants}>
-            <RecentLessons lessons={user.recentLessons} />
-          </motion.div>
-
+        <div className="lg:col-span-2 flex flex-col gap-6 w-full max-w-full overflow-hidden">
           <motion.div variants={itemVariants}>
             <StatsCard stats={stats} />
           </motion.div>
@@ -104,17 +122,6 @@ export const HomePage: React.FC = () => {
 
           <motion.div variants={itemVariants}>
             <DailyGoalCard dailyXp={user.dailyXp} dailyGoal={user.dailyGoal} />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <ProgressCard
-              learnedKana={user.learnedKana}
-              learnedKanji={user.learnedKanji}
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <AchievementsCard achievements={user.achievements} />
           </motion.div>
         </div>
       </div>
