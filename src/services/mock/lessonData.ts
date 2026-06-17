@@ -172,8 +172,8 @@ export const mockPracticeSessions: PracticeSession[] = [
   {
     id: 'p1',
     type: 'flashcards',
-    title: 'Флеш-карты: Хирагана',
-    description: 'Повторяйте хирагану с помощью карточек для запоминания.',
+    title: 'Флеш-карты: Катакана',
+    description: 'Повторяйте катакану с помощью карточек для запоминания.',
     icon: 'Layers',
     itemCount: 46,
     completedCount: 46,
@@ -182,8 +182,8 @@ export const mockPracticeSessions: PracticeSession[] = [
   {
     id: 'p2',
     type: 'writing',
-    title: 'Письмо: Катакана',
-    description: 'Практикуйте написание символов катаканы в правильном порядке черт.',
+    title: 'Письмо: Хирагана',
+    description: 'Практикуйте написание символов хираганы в правильном порядке черт.',
     icon: 'PenTool',
     itemCount: 46,
     completedCount: 15,

@@ -6,6 +6,7 @@ import AlphabetPage from './pages/AlphabetPage';
 import KanjiPage from './pages/KanjiPage';
 import DictionaryPage from './pages/DictionaryPage';
 import PracticePage from './pages/PracticePage';
+import PracticeSessionPage from './pages/PracticeSessionPage';
 import TestsPage from './pages/TestsPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: 'practice',
         element: <PracticePage />,
+      },
+      {
+        path: 'practice/:sessionId',
+        element: <PracticeSessionPage />,
       },
       {
         path: 'tests',

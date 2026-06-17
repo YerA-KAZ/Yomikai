@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Layers, PenTool, Puzzle, HelpCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { lessonApi } from '../services/api/lessonApi';
@@ -7,8 +8,10 @@ import { Button } from '../shared/ui/Button';
 import { ProgressBar } from '../shared/ui/ProgressBar';
 import { Badge } from '../shared/ui/Badge';
 import type { PracticeSession } from '../entities/lesson/types';
+import { getProgressStats, loadProgress } from '../features/practice/utils';
 
 export const PracticePage: React.FC = () => {
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState<PracticeSession[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -94,7 +97,11 @@ export const PracticePage: React.FC = () => {
       {/* Grid List */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
         {sessions.map((session, idx) => {
-          const progressPercentage = Math.round((session.completedCount / session.itemCount) * 100);
+          const saved = loadProgress(session.id);
+          const { completedCount, accuracy } = getProgressStats(saved);
+          const displayCompleted = completedCount || session.completedCount;
+          const displayAccuracy = saved.totalAttempts > 0 ? accuracy : session.accuracy;
+          const progressPercentage = Math.round((displayCompleted / session.itemCount) * 100);
           const config = getPracticeConfig(session.type);
 
           return (
@@ -130,16 +137,16 @@ export const PracticePage: React.FC = () => {
                   {/* Stats Row */}
                   <div className="flex flex-wrap justify-between items-center gap-3">
                     <Badge variant="default" className="text-[10px] font-black uppercase tracking-wider bg-surface/80 backdrop-blur-sm">
-                      Точность: {session.accuracy}%
+                      Точность: {displayAccuracy}%
                     </Badge>
                     <div className="text-[10px] font-bold text-text-secondary bg-bg-secondary/50 px-2 py-1 rounded-md border border-border/10">
-                      {session.completedCount} / {session.itemCount} ({progressPercentage}%)
+                      {displayCompleted} / {session.itemCount} ({progressPercentage}%)
                     </div>
                   </div>
 
                   {/* Progress bar */}
                   <div className="bg-surface/50 p-2 rounded-xl border border-border/10 backdrop-blur-sm shadow-inner">
-                    <ProgressBar value={session.completedCount} max={session.itemCount} height="sm" />
+                    <ProgressBar value={displayCompleted} max={session.itemCount} height="sm" />
                   </div>
 
                   {/* Play button CTA */}
@@ -148,7 +155,7 @@ export const PracticePage: React.FC = () => {
                       variant="primary"
                       size="sm"
                       className="w-full sm:w-auto flex items-center gap-1.5 rounded-xl text-xs font-black shadow-lg hover:scale-105"
-                      onClick={() => alert(`Режим «${session.title}» будет доступен в следующем обновлении!`)}
+                      onClick={() => navigate(`/practice/${session.id}`)}
                     >
                       Старт <ArrowRight className="w-4 h-4" />
                     </Button>
