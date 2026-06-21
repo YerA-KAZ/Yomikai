@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Main pad -->
+  <ellipse cx="16" cy="20" rx="7" ry="6" fill="#FF8C00" opacity="0.9"/>
+  <!-- Top pads -->
+  <circle cx="9" cy="11" r="3.5" fill="#FF8C00" opacity="0.9"/>
+  <circle cx="16" cy="8" r="3.5" fill="#FF8C00" opacity="0.9"/>
+  <circle cx="23" cy="11" r="3.5" fill="#FF8C00" opacity="0.9"/>
+</svg>
