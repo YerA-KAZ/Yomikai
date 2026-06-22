@@ -9,4 +9,7 @@ export interface KanjiChar {
   examples: { word: string; reading: string; meaning: string }[];
   radical: string;
   learned: boolean;
+  hint?: string;
+  strokes?: { paths: string[]; order: number }[];
+  words?: { word: string; reading: string; meaning: string }[];
 }

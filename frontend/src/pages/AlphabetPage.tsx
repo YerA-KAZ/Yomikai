@@ -7,6 +7,7 @@ import { Card } from '../shared/ui/Card';
 import { ProgressBar } from '../shared/ui/ProgressBar';
 import { Badge } from '../shared/ui/Badge';
 import type { KanaGroup, KanaChar } from '../entities/kana/types';
+import { AlphabetStudyOverlay } from '../features/study/AlphabetStudyOverlay';
 
 interface AlphabetPageProps {
   defaultTab?: 'hiragana' | 'katakana';
@@ -26,6 +27,7 @@ export const AlphabetPage: React.FC<AlphabetPageProps> = ({ defaultTab }) => {
   const [loading, setLoading] = useState(true);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [selectedChar, setSelectedChar] = useState<KanaChar | null>(null);
+  const [activeStudyGroup, setActiveStudyGroup] = useState<KanaGroup | null>(null);
 
   // Sync state if URL path parameter changes
   useEffect(() => {
@@ -69,6 +71,24 @@ export const AlphabetPage: React.FC<AlphabetPageProps> = ({ defaultTab }) => {
   const handleCardClick = (char: KanaChar) => {
     setSelectedCardId(selectedCardId === char.id ? null : char.id);
     setSelectedChar(char);
+  };
+
+  const handleStudyFinish = async (learnedIds: string[], xpEarned: number) => {
+    setActiveStudyGroup(null);
+    if (learnedIds.length === 0) return;
+
+    try {
+      await kanaApi.markLearned(learnedIds, xpEarned);
+      // Update local state so that checked characters appear as learned immediately
+      setGroups(prevGroups => prevGroups.map(g => ({
+        ...g,
+        chars: g.chars.map(c => 
+          learnedIds.includes(c.id) ? { ...c, learned: true } : c
+        )
+      })));
+    } catch (err) {
+      console.error('Failed to mark learned', err);
+    }
   };
 
   const getGroupColorClass = (index: number) => {
@@ -187,9 +207,17 @@ export const AlphabetPage: React.FC<AlphabetPageProps> = ({ defaultTab }) => {
             className="flex flex-col gap-3"
           >
             {/* Group Header */}
-            <div className="flex items-baseline gap-2 border-b border-border/10 pb-2">
-              <h2 className="text-lg font-extrabold text-text">{group.nameJp}</h2>
-              <span className="text-[10px] font-black text-text-muted uppercase tracking-widest">Ряд {group.name}</span>
+            <div className="flex items-baseline gap-6 border-b border-border/10 pb-2">
+              <div className="flex items-baseline gap-2">
+                <h2 className="text-lg font-extrabold text-text">{group.nameJp}</h2>
+                <span className="text-[10px] font-black text-text-muted uppercase tracking-widest">Ряд {group.name}</span>
+              </div>
+              <button 
+                onClick={() => setActiveStudyGroup(group)}
+                className="text-xs font-bold text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1 rounded-xl transition-colors"
+              >
+                Изучить
+              </button>
             </div>
 
             {/* Characters Grid */}
@@ -284,6 +312,18 @@ export const AlphabetPage: React.FC<AlphabetPageProps> = ({ defaultTab }) => {
               </div>
             )}
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Study Overlay */}
+      <AnimatePresence>
+        {activeStudyGroup && (
+          <AlphabetStudyOverlay
+            group={activeStudyGroup}
+            allGroups={groups}
+            onClose={() => setActiveStudyGroup(null)}
+            onFinish={handleStudyFinish}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, BookOpen, Layers, Sparkles, Edit3 } from 'lucide-react';
+import { Search, BookOpen, Layers, Edit3, GraduationCap } from 'lucide-react';
 import { kanjiApi } from '../services/api/kanjiApi';
 import { Card } from '../shared/ui/Card';
 import { Badge } from '../shared/ui/Badge';
-import { ProgressBar } from '../shared/ui/ProgressBar';
+import { KanjiStudyOverlay } from '../features/study/KanjiStudyOverlay';
 import type { KanjiChar } from '../entities/kanji/types';
 
 export const KanjiPage: React.FC = () => {
@@ -13,6 +13,7 @@ export const KanjiPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeLevel, setActiveLevel] = useState<'N5' | 'N4' | 'N3' | 'N2' | 'N1'>('N5');
   const [selectedKanji, setSelectedKanji] = useState<KanjiChar | null>(null);
+  const [studyKanji, setStudyKanji] = useState<KanjiChar | null>(null);
 
   useEffect(() => {
     kanjiApi.getAll()
@@ -38,6 +39,25 @@ export const KanjiPage: React.FC = () => {
   const totalCount = kanjiList.length;
 
   const levels: ('N5' | 'N4' | 'N3' | 'N2' | 'N1')[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
+
+  const handleStudyFinish = async (kanjiId: string, xpEarned: number) => {
+    await kanjiApi.markLearned(kanjiId, xpEarned);
+    setKanjiList((items) => items.map((item) => item.id === kanjiId ? { ...item, learned: true } : item));
+    setSelectedKanji((current) => current?.id === kanjiId ? { ...current, learned: true } : current);
+  };
+
+  const handleNextKanji = () => {
+    if (!studyKanji) return;
+    const currentIndex = filteredKanji.findIndex((item) => item.id === studyKanji.id);
+    const nextKanji = filteredKanji[currentIndex + 1];
+    if (nextKanji) {
+      setStudyKanji(nextKanji);
+      setSelectedKanji(nextKanji);
+      return;
+    }
+    setStudyKanji(null);
+    setSelectedKanji(null);
+  };
 
   if (loading) {
     return (
@@ -210,21 +230,6 @@ export const KanjiPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Visual Stroke Order Guide Simulation (Static) */}
-            <div className="bg-surface/50 border border-border/15 p-3 rounded-2xl flex items-center justify-center gap-2 overflow-hidden shadow-inner">
-              {[...Array(Math.min(selectedKanji.strokeCount, 5))].map((_, i) => (
-                <div key={i} className="w-10 h-10 bg-bg-secondary/80 rounded-xl border border-border/20 flex items-center justify-center font-jp font-bold text-text-muted opacity-50 relative">
-                  <span className="absolute text-[8px] top-0.5 left-1">{i + 1}</span>
-                  {selectedKanji.char}
-                </div>
-              ))}
-              {selectedKanji.strokeCount > 5 && (
-                <div className="w-10 h-10 flex items-center justify-center font-black text-text-muted/50">
-                  ...
-                </div>
-              )}
-            </div>
-
             {/* Readings breakdown */}
             <div className="flex flex-col gap-3.5 bg-bg-secondary/40 p-4 rounded-2xl border border-border/10 text-xs shadow-sm">
               {/* Kun'yomi */}
@@ -268,7 +273,28 @@ export const KanjiPage: React.FC = () => {
                 </div>
               </div>
             )}
+
+            <button
+              onClick={() => setStudyKanji(selectedKanji)}
+              className="w-full bg-primary text-white font-extrabold py-3 px-5 rounded-2xl flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+            >
+              <GraduationCap className="w-5 h-5" />
+              Изучить
+            </button>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {studyKanji && (
+          <KanjiStudyOverlay
+            key={studyKanji.id}
+            kanji={studyKanji}
+            allKanji={kanjiList}
+            onClose={() => setStudyKanji(null)}
+            onFinish={handleStudyFinish}
+            onNextKanji={handleNextKanji}
+          />
         )}
       </AnimatePresence>
     </div>

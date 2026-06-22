@@ -134,6 +134,9 @@ model Kanji {
   radical     String
   learned     Boolean @default(false)
   sortOrder   Int     @default(0)
+  hint        String?
+  strokes     Json?
+  words       Json?
 }
 
 model Lesson {

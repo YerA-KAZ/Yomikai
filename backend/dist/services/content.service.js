@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getKanaGroups = getKanaGroups;
 exports.getKanjiList = getKanjiList;
@@ -7,6 +40,7 @@ exports.getLessonsForUser = getLessonsForUser;
 exports.getLessonById = getLessonById;
 exports.getPracticeSessions = getPracticeSessions;
 exports.getLessonProgressSummary = getLessonProgressSummary;
+exports.markKanaLearned = markKanaLearned;
 const prisma_1 = require("../lib/prisma");
 const http_1 = require("../lib/http");
 function mapQuestion(question) {
@@ -63,6 +97,9 @@ async function getKanjiList(client = prisma_1.prisma, filters = {}) {
         examples: Array.isArray(item.examples) ? item.examples : [],
         radical: item.radical,
         learned: item.learned,
+        hint: item.hint ?? undefined,
+        strokes: Array.isArray(item.strokes) ? item.strokes : undefined,
+        words: Array.isArray(item.words) ? item.words : undefined,
     }));
 }
 async function getDictionaryEntries(client = prisma_1.prisma, filters = {}) {
@@ -187,4 +224,24 @@ async function getLessonProgressSummary(client = prisma_1.prisma, lessonId, user
         },
     });
     return progress;
+}
+async function markKanaLearned(client = prisma_1.prisma, kanaIds, userId, xpReward) {
+    // Update the global kana learned state (since schema doesn't have UserKana table)
+    await client.kanaChar.updateMany({
+        where: { id: { in: kanaIds } },
+        data: { learned: true },
+    });
+    if (userId) {
+        // Increase learnedKana count on User
+        await client.user.update({
+            where: { id: userId },
+            data: { learnedKana: { increment: kanaIds.length } },
+        });
+        if (xpReward && xpReward > 0) {
+            // Lazy import grantXp to avoid circular dependencies
+            const { grantXp } = await Promise.resolve().then(() => __importStar(require('./user.service')));
+            await grantXp(client, userId, xpReward, { source: 'kana_study' });
+        }
+    }
+    return { success: true };
 }

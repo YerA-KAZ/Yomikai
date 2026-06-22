@@ -1,7 +1,8 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Award, Flame, Footprints, BookOpen, PenTool, Clock, Calendar, CheckCircle2, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Award, Flame, Footprints, BookOpen, PenTool, Clock, Calendar, CheckCircle2, X } from 'lucide-react';
 import { useUserStore } from '../features/user/useUserStore';
+import { userApi } from '../services/api/userApi';
 import { Card } from '../shared/ui/Card';
 import { ProgressBar } from '../shared/ui/ProgressBar';
 import { Badge } from '../shared/ui/Badge';
@@ -9,7 +10,32 @@ import { Button } from '../shared/ui/Button';
 import { ProgressCard } from '../widgets/Dashboard/ProgressCard';
 
 export const ProfilePage: React.FC = () => {
-  const { user, stats } = useUserStore();
+  const { user, stats, fetchUser } = useUserStore();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editAvatar, setEditAvatar] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const openEditModal = () => {
+    if (user) {
+      setEditName(user.name);
+      setEditAvatar(user.avatar);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSaving(true);
+    try {
+      await userApi.updateProfile({ name: editName, avatar: editAvatar });
+      await fetchUser();
+      setIsEditModalOpen(false);
+    } catch (err) {
+      console.error('Failed to update profile', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (!user || !stats) {
     return (
@@ -89,9 +115,13 @@ export const ProfilePage: React.FC = () => {
                 transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
                 className="absolute -inset-2 rounded-full border border-dashed border-primary/30 group-hover:border-primary/50 transition-colors"
               />
-              <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-accent p-[3px] shadow-lg shadow-primary/20 transform group-hover:scale-105 transition-transform duration-300">
-                <div className="w-full h-full rounded-[1.8rem] bg-surface flex items-center justify-center font-black text-4xl text-transparent bg-clip-text bg-gradient-to-br from-primary to-accent font-jp shadow-inner">
-                  {user.name.charAt(0)}
+              <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-accent p-[3px] shadow-lg shadow-primary/20 transform group-hover:scale-105 transition-transform duration-300 overflow-hidden relative">
+                <div className="w-full h-full rounded-[1.8rem] bg-surface flex items-center justify-center font-black text-4xl text-transparent bg-clip-text bg-gradient-to-br from-primary to-accent font-jp shadow-inner overflow-hidden">
+                  {user.avatar.startsWith('/') || user.avatar.startsWith('http') ? (
+                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    user.name.charAt(0).toUpperCase()
+                  )}
                 </div>
               </div>
               <div className="absolute -bottom-2 -right-2 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white w-8 h-8 rounded-xl flex items-center justify-center font-extrabold border-2 border-surface shadow-md text-sm">
@@ -123,11 +153,21 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-3 w-full md:w-auto relative z-10">
+            {localStorage.getItem('user_role') === 'admin' && (
+              <Button
+                variant="primary"
+                size="md"
+                className="rounded-xl font-bold w-full shadow-md bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white border-0"
+                onClick={() => window.location.href = '/admin'}
+              >
+                Админ Панель
+              </Button>
+            )}
             <Button
               variant="secondary"
               size="md"
               className="rounded-xl font-bold w-full border-border/20 shadow-sm"
-              onClick={() => alert('Редактирование профиля будет добавлено в ближайших обновлениях!')}
+              onClick={openEditModal}
             >
               Редактировать
             </Button>
@@ -259,6 +299,57 @@ export const ProfilePage: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <AnimatePresence>
+        {isEditModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-md bg-surface border border-border/20 rounded-3xl shadow-2xl overflow-hidden"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-border/10">
+                <h3 className="text-xl font-extrabold text-text">Редактировать профиль</h3>
+                <button onClick={() => setIsEditModalOpen(false)} className="text-text-muted hover:text-text transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="p-6 flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-bold text-text-secondary">Имя пользователя</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="bg-bg border border-border/50 rounded-xl px-4 py-3 text-text focus:outline-none focus:border-primary"
+                    placeholder="Введите ваше имя"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-bold text-text-secondary">Аватар (ссылка)</label>
+                  <input
+                    type="text"
+                    value={editAvatar}
+                    onChange={(e) => setEditAvatar(e.target.value)}
+                    className="bg-bg border border-border/50 rounded-xl px-4 py-3 text-text focus:outline-none focus:border-primary"
+                    placeholder="https://... или /avatar-default.svg"
+                  />
+                  <span className="text-[10px] text-text-muted">Оставьте пустым для отображения первой буквы имени</span>
+                </div>
+                
+                <div className="mt-4 flex justify-end gap-3">
+                  <Button variant="ghost" onClick={() => setIsEditModalOpen(false)}>Отмена</Button>
+                  <Button variant="primary" onClick={handleSaveProfile} disabled={isSaving}>
+                    {isSaving ? 'Сохранение...' : 'Сохранить'}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

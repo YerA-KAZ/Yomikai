@@ -33,6 +33,9 @@ export interface KanjiCharDto {
   examples: { word: string; reading: string; meaning: string }[];
   radical: string;
   learned: boolean;
+  hint?: string;
+  strokes?: { paths: string[]; order: number }[];
+  words?: { word: string; reading: string; meaning: string }[];
 }
 
 export interface DictionaryEntryDto {
@@ -46,9 +49,19 @@ export interface DictionaryEntryDto {
   tags: string[];
 }
 
+export type QuestionTypeDto =
+  | 'kana_symbol_to_reading'
+  | 'kana_reading_to_symbol'
+  | 'kana_fill_blank'
+  | 'kanji_to_meaning'
+  | 'meaning_to_kanji'
+  | 'word_to_reading'
+  | 'kanji_in_context'
+  | 'word_composition';
+
 export interface QuestionDto {
   id: string;
-  type: 'multiple_choice' | 'typing' | 'matching' | 'listening';
+  type: QuestionTypeDto;
   question: string;
   options?: string[];
   correctAnswer: string;
@@ -145,6 +158,9 @@ export async function getKanjiList(client: DbClient = prisma, filters: { level?:
     examples: Array.isArray(item.examples) ? item.examples as KanjiCharDto['examples'] : [],
     radical: item.radical,
     learned: item.learned,
+    hint: item.hint ?? undefined,
+    strokes: Array.isArray(item.strokes) ? item.strokes as KanjiCharDto['strokes'] : undefined,
+    words: Array.isArray(item.words) ? item.words as KanjiCharDto['words'] : undefined,
   }));
 }
 
@@ -286,4 +302,33 @@ export async function getLessonProgressSummary(client: DbClient = prisma, lesson
   });
 
   return progress;
+}
+
+export async function markKanaLearned(
+  client: DbClient = prisma,
+  kanaIds: string[],
+  userId?: string,
+  xpReward?: number,
+): Promise<{ success: true }> {
+  // Update the global kana learned state (since schema doesn't have UserKana table)
+  await client.kanaChar.updateMany({
+    where: { id: { in: kanaIds } },
+    data: { learned: true },
+  });
+
+  if (userId) {
+    // Increase learnedKana count on User
+    await client.user.update({
+      where: { id: userId },
+      data: { learnedKana: { increment: kanaIds.length } },
+    });
+
+    if (xpReward && xpReward > 0) {
+      // Lazy import grantXp to avoid circular dependencies
+      const { grantXp } = await import('./user.service');
+      await grantXp(client, userId, xpReward, { source: 'kana_study' });
+    }
+  }
+
+  return { success: true };
 }

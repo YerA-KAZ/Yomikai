@@ -25,11 +25,49 @@ router.get('/kana/katakana', async (_req, res, next) => {
   }
 });
 
+router.post('/kana/learn', async (req, res, next) => {
+  try {
+    const { kanaIds, xpReward } = req.body;
+    if (!Array.isArray(kanaIds)) {
+      res.status(400).json({ error: 'kanaIds must be an array' });
+      return;
+    }
+    
+    // Dynamically import markKanaLearned since we didn't add it to imports yet
+    const { markKanaLearned } = await import('../services/content.service');
+    const data = await markKanaLearned(prisma, kanaIds, req.authUser?.id, xpReward);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/kanji', async (req, res, next) => {
   try {
     const level = typeof req.query.level === 'string' ? req.query.level : undefined;
     const data = await getKanjiList(prisma, { level });
     res.json(data);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/kanji/learn', async (req, res, next) => {
+  try {
+    const { kanjiId, xpReward } = req.body;
+    if (!kanjiId) {
+      res.status(400).json({ error: 'kanjiId is required' });
+      return;
+    }
+    await prisma.kanji.update({
+      where: { id: kanjiId },
+      data: { learned: true },
+    });
+    if (req.authUser?.id && xpReward > 0) {
+      const { grantXp } = await import('../services/user.service');
+      await grantXp(prisma, req.authUser.id, xpReward, { source: 'kanji_study' });
+    }
+    res.json({ success: true });
   } catch (error) {
     next(error);
   }

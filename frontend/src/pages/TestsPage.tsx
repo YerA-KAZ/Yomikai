@@ -7,6 +7,7 @@ import { Card } from '../shared/ui/Card';
 import { Button } from '../shared/ui/Button';
 import { Badge } from '../shared/ui/Badge';
 import type { Lesson } from '../entities/lesson/types';
+import { QUESTION_TYPE_LABELS } from '../entities/lesson/types';
 
 export const TestsPage: React.FC = () => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -156,7 +157,7 @@ export const TestsPage: React.FC = () => {
                       {getDifficultyTranslation(lesson.difficulty)}
                     </Badge>
                     <Badge variant="default" className="text-[9px] uppercase font-bold tracking-wider">
-                      {lesson.type}
+                      {lesson.questions[0] ? QUESTION_TYPE_LABELS[lesson.questions[0].type] : lesson.type}
                     </Badge>
                   </div>
                   <h3 className="text-xl font-black mt-2 leading-tight drop-shadow-sm line-clamp-2">{lesson.title}</h3>

@@ -190,8 +190,12 @@ export const LeaderboardPage: React.FC = () => {
             >
               <div className="flex flex-col items-center gap-1.5 mb-2">
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-slate-200 border-2 border-slate-300 flex items-center justify-center font-black text-slate-800 text-lg shadow-md group-hover:scale-105 transition-transform">
-                    {podiumUsers[1].avatar}
+                  <div className="w-12 h-12 rounded-full bg-slate-200 border-2 border-slate-300 flex items-center justify-center font-black text-slate-800 text-lg shadow-md group-hover:scale-105 transition-transform overflow-hidden">
+                    {podiumUsers[1].avatar.startsWith('/') || podiumUsers[1].avatar.startsWith('http') ? (
+                      <img src={podiumUsers[1].avatar} alt={podiumUsers[1].name} className="w-full h-full object-cover" />
+                    ) : (
+                      podiumUsers[1].avatar
+                    )}
                   </div>
                   <span className="absolute -top-1.5 -right-1.5 bg-slate-400 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px] border border-white">2</span>
                 </div>
@@ -217,8 +221,12 @@ export const LeaderboardPage: React.FC = () => {
                   <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-amber-500 group-hover:scale-110 transition-transform">
                     <Award className="w-6 h-6 animate-pulse" />
                   </div>
-                  <div className="w-16 h-16 rounded-full bg-amber-100 border-2 border-amber-300 flex items-center justify-center font-black text-amber-800 text-2xl shadow-xl shadow-amber-500/10 group-hover:scale-105 transition-transform">
-                    {podiumUsers[0].avatar}
+                  <div className="w-16 h-16 rounded-full bg-amber-100 border-2 border-amber-300 flex items-center justify-center font-black text-amber-800 text-2xl shadow-xl shadow-amber-500/10 group-hover:scale-105 transition-transform overflow-hidden">
+                    {podiumUsers[0].avatar.startsWith('/') || podiumUsers[0].avatar.startsWith('http') ? (
+                      <img src={podiumUsers[0].avatar} alt={podiumUsers[0].name} className="w-full h-full object-cover" />
+                    ) : (
+                      podiumUsers[0].avatar
+                    )}
                   </div>
                   <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px] border border-white">1</span>
                 </div>
@@ -242,8 +250,12 @@ export const LeaderboardPage: React.FC = () => {
             >
               <div className="flex flex-col items-center gap-1.5 mb-2">
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-orange-100 border-2 border-orange-200 flex items-center justify-center font-black text-orange-800 text-lg shadow-md group-hover:scale-105 transition-transform">
-                    {podiumUsers[2].avatar}
+                  <div className="w-12 h-12 rounded-full bg-orange-100 border-2 border-orange-200 flex items-center justify-center font-black text-orange-800 text-lg shadow-md group-hover:scale-105 transition-transform overflow-hidden">
+                    {podiumUsers[2].avatar.startsWith('/') || podiumUsers[2].avatar.startsWith('http') ? (
+                      <img src={podiumUsers[2].avatar} alt={podiumUsers[2].name} className="w-full h-full object-cover" />
+                    ) : (
+                      podiumUsers[2].avatar
+                    )}
                   </div>
                   <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px] border border-white">3</span>
                 </div>
@@ -271,7 +283,8 @@ export const LeaderboardPage: React.FC = () => {
         >
           {remainingUsers.map((item) => {
             const isTopZone = item.rank <= 3; // podium
-            const isRelegationZone = item.rank >= 8; // relegation zone
+            const isRelegationZone = item.rank >= leaderboardData.length - 3; // Let's make bottom 3 the relegation zone, or rank >= 8 if length is 10. Let's use rank >= 8 to be safe as previously defined.
+            const relegationStyle = item.rank >= 8;
 
             return (
               <motion.div 
@@ -280,6 +293,8 @@ export const LeaderboardPage: React.FC = () => {
                 className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
                   item.isCurrentUser
                     ? 'bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/40 ring-1 ring-primary/20 shadow-md'
+                    : relegationStyle
+                    ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10 hover:border-red-500/30'
                     : 'bg-surface/50 border-border/10 hover:bg-surface hover:border-border/20 hover:scale-[1.005]'
                 }`}
               >
@@ -293,12 +308,16 @@ export const LeaderboardPage: React.FC = () => {
                   </span>
 
                   {/* Avatar badge */}
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shadow-inner ${
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shadow-inner overflow-hidden ${
                     item.isCurrentUser 
                       ? 'bg-primary text-white' 
                       : 'bg-bg-secondary text-text-secondary border border-border/10'
                   }`}>
-                    {item.avatar}
+                    {item.avatar.startsWith('/') || item.avatar.startsWith('http') ? (
+                      <img src={item.avatar} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      item.avatar
+                    )}
                   </div>
 
                   {/* Username & Level */}
@@ -340,9 +359,7 @@ export const LeaderboardPage: React.FC = () => {
 
                   {/* Trend Indicator */}
                   <div className="w-4 flex justify-center text-text-muted">
-                    {item.rank === 4 ? (
-                      <ChevronUp className="w-4 h-4 text-emerald-500" />
-                    ) : item.rank === 6 ? (
+                    {relegationStyle ? (
                       <ChevronDown className="w-4 h-4 text-red-500" />
                     ) : (
                       <span className="text-xs font-bold">-</span>

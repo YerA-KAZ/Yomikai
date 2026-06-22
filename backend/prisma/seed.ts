@@ -35,12 +35,12 @@ function loadMockModule<T>(relativeFilePath: string): T {
   return module.exports as T;
 }
 
-const { hiraganaGroups } = loadMockModule<{ hiraganaGroups: any[] }>('../../frontend/src/services/mock/hiraganaData.ts');
-const { katakanaGroups } = loadMockModule<{ katakanaGroups: any[] }>('../../frontend/src/services/mock/katakanaData.ts');
-const { kanjiList } = loadMockModule<{ kanjiList: any[] }>('../../frontend/src/services/mock/kanjiData.ts');
-const { dictionaryEntries } = loadMockModule<{ dictionaryEntries: any[] }>('../../frontend/src/services/mock/dictionaryData.ts');
-const { mockLessons, mockPracticeSessions } = loadMockModule<{ mockLessons: any[]; mockPracticeSessions: any[] }>('../../frontend/src/services/mock/lessonData.ts');
-const { mockUser, mockUserStats } = loadMockModule<{ mockUser: any; mockUserStats: any }>('../../frontend/src/services/mock/userData.ts');
+const { hiraganaGroups } = loadMockModule<{ hiraganaGroups: any[] }>('../../src/services/mock/hiraganaData.ts');
+const { katakanaGroups } = loadMockModule<{ katakanaGroups: any[] }>('../../src/services/mock/katakanaData.ts');
+const { kanjiList } = loadMockModule<{ kanjiList: any[] }>('../../src/services/mock/kanjiData.ts');
+const { dictionaryEntries } = loadMockModule<{ dictionaryEntries: any[] }>('../../src/services/mock/dictionaryData.ts');
+const { mockLessons, mockPracticeSessions } = loadMockModule<{ mockLessons: any[]; mockPracticeSessions: any[] }>('../../src/services/mock/lessonData.ts');
+const { mockUser, mockUserStats } = loadMockModule<{ mockUser: any; mockUserStats: any }>('../../src/services/mock/userData.ts');
 
 const SAMPLE_USERS = [
   { name: 'Hiroshi', email: 'hiroshi@yomikai.ru', xp: 2450, streak: 14, weeklyXp: 2450 },
