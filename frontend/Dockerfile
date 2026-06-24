@@ -3,7 +3,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Use environment variable for VITE_API_URL (set by Render)
-ENV VITE_API_URL=${VITE_API_URL:-/api}
+ENV VITE_API_URL=${VITE_API_URL:-}
 
 # Copy package files
 COPY package*.json ./
