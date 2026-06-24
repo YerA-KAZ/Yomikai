@@ -1,6 +1,31 @@
 version: "1"
 
 services:
+  # ==========================================
+  # Frontend (React + Nginx)
+  # ==========================================
+  - type: web
+    name: yomikai-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    routes:
+      # Настройка для React Router (SPA fallback)
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+    envVars:
+      - key: VITE_API_URL
+        value: https://yomikai-backend.onrender.com/api
+
+  # ==========================================
+  # Backend (Express + Prisma)
+  # ==========================================
   - type: web
     name: yomikai-backend
     env: node
@@ -13,32 +38,19 @@ services:
           name: yomikai-db
           property: connectionString
       - key: JWT_SECRET
-        generateValue: true
+        value: CHANGE_ME_IN_DASHBOARD  # ⚠️ Make sure to change this secret in the Render dashboard for security.
       - key: FRONTEND_ORIGIN
-        # Render может добавить уникальный хэш к URL фронтенда (например, yomikai-frontend-abc1.onrender.com).
-        # Если это произойдет, вам нужно будет вручную обновить эту переменную в дашборде Render.
-        value: "https://yomikai-frontend.onrender.com"
-        
-  - type: web
-    name: yomikai-frontend
-    env: static
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    publishPath: dist
-    routes:
-      # Настройка для React Router (SPA fallback)
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: yomikai-backend
-          envVarKey: RENDER_EXTERNAL_URL
+        value: https://yomikai-frontend.onrender.com
+      - key: PORT
+        value: "3001"
+      - key: NODE_ENV
+        value: production
 
+# ==========================================
+# PostgreSQL Database
+# ==========================================
 databases:
   - name: yomikai-db
     databaseName: yomikai
-    user: yomikai
-    plan: free # Можно изменить на 'starter', если нужна платная БД
+    user: postgres
+    plan: free
