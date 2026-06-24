@@ -52,5 +52,5 @@ services:
 databases:
   - name: yomikai-db
     databaseName: yomikai
-    user: postgres
+
     plan: free
