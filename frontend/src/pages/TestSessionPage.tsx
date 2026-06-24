@@ -86,6 +86,7 @@ export const TestSessionPage: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [selectedMulti, setSelectedMulti] = useState<string[]>([]);
+  const [textInput, setTextInput] = useState('');
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [score, setScore] = useState(0);
@@ -148,6 +149,23 @@ export const TestSessionPage: React.FC = () => {
     }
   };
 
+  const handleTextSubmit = (answer: string) => {
+    if (!currentQuestion || isAnswered) return;
+
+    const correct = checkAnswer(answer, currentQuestion.correctAnswer, currentQuestion.type);
+    setIsCorrect(correct);
+    setIsAnswered(true);
+    if (correct) setScore((prev) => prev + 1);
+    setAnswersLog((prev) => [
+      ...prev,
+      { questionId: currentQuestion.id, userAnswer: answer, correct },
+    ]);
+
+    if (correct) {
+      setTimeout(() => advanceQuestion(), 1200);
+    }
+  };
+
   const toggleMultiOption = (option: string) => {
     if (isAnswered) return;
     setSelectedMulti((prev) =>
@@ -160,6 +178,7 @@ export const TestSessionPage: React.FC = () => {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
       setSelectedMulti([]);
+      setTextInput('');
       setIsAnswered(false);
       setIsCorrect(false);
     } else {
@@ -323,7 +342,51 @@ export const TestSessionPage: React.FC = () => {
         )}
 
         <div className="w-full max-w-md flex flex-col gap-3 relative z-10">
-          {isMulti ? (
+          {options.length === 0 ? (
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (textInput.trim()) handleTextSubmit(textInput);
+              }}
+              className="flex flex-col gap-3 w-full"
+            >
+              <div className="relative">
+                <input
+                  type="text"
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  disabled={isAnswered}
+                  autoFocus
+                  placeholder="Введите ответ..."
+                  className={`w-full bg-bg border-2 rounded-2xl px-6 py-4 text-xl font-bold text-center focus:outline-none transition-colors disabled:opacity-100 ${
+                    isAnswered 
+                      ? isCorrect 
+                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600' 
+                        : 'border-red-500 bg-red-500/10 text-red-500'
+                      : 'border-border/50 focus:border-primary text-text'
+                  }`}
+                />
+                {isAnswered && (
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    {isCorrect ? (
+                      <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                    ) : (
+                      <XCircle className="w-6 h-6 text-red-500" />
+                    )}
+                  </div>
+                )}
+              </div>
+              {!isAnswered && (
+                <button
+                  type="submit"
+                  disabled={!textInput.trim()}
+                  className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-xl disabled:opacity-50"
+                >
+                  Проверить
+                </button>
+              )}
+            </form>
+          ) : isMulti ? (
             <>
               <div className="grid grid-cols-2 gap-3">
                 {options.map((option) => {
@@ -333,9 +396,15 @@ export const TestSessionPage: React.FC = () => {
                     .map((part) => part.trim())
                     .includes(option);
                   let stateClass = 'border-border/50 hover:border-primary bg-bg';
+                  let Icon = null;
                   if (isAnswered) {
-                    if (isCorrectOption) stateClass = 'border-emerald-500 bg-emerald-500/10 text-emerald-600';
-                    else if (isSelected) stateClass = 'border-red-500 bg-red-500/10 text-red-500';
+                    if (isCorrectOption) {
+                      stateClass = 'border-emerald-500 bg-emerald-500/10 text-emerald-600';
+                      Icon = <CheckCircle2 className="w-6 h-6 text-emerald-500" />;
+                    } else if (isSelected) {
+                      stateClass = 'border-red-500 bg-red-500/10 text-red-500';
+                      Icon = <XCircle className="w-6 h-6 text-red-500" />;
+                    }
                   } else if (isSelected) {
                     stateClass = 'border-primary bg-primary/10 text-primary';
                   }
@@ -346,9 +415,14 @@ export const TestSessionPage: React.FC = () => {
                       type="button"
                       disabled={isAnswered}
                       onClick={() => toggleMultiOption(option)}
-                      className={`py-4 rounded-2xl border-2 font-jp text-3xl font-black transition-all ${stateClass}`}
+                      className={`py-4 px-3 rounded-2xl border-2 font-jp text-3xl font-black transition-all relative flex items-center justify-center min-h-[64px] ${stateClass}`}
                     >
                       {option}
+                      {Icon && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {Icon}
+                        </div>
+                      )}
                     </button>
                   );
                 })}
@@ -368,11 +442,14 @@ export const TestSessionPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-3">
               {options.map((option) => {
                 let stateClass = 'border-border/50 hover:border-primary bg-bg text-text';
+                let Icon = null;
                 if (isAnswered) {
                   if (option === currentQuestion.correctAnswer) {
                     stateClass = 'border-emerald-500 bg-emerald-500/10 text-emerald-600';
+                    Icon = <CheckCircle2 className="w-6 h-6 text-emerald-500" />;
                   } else if (option === selectedOption) {
                     stateClass = 'border-red-500 bg-red-500/10 text-red-500';
+                    Icon = <XCircle className="w-6 h-6 text-red-500" />;
                   }
                 } else if (option === selectedOption) {
                   stateClass = 'border-primary bg-primary/10 text-primary';
@@ -384,9 +461,14 @@ export const TestSessionPage: React.FC = () => {
                     type="button"
                     disabled={isAnswered}
                     onClick={() => handleOptionSelect(option)}
-                    className={`py-4 px-3 rounded-2xl border-2 font-bold transition-all ${stateClass} ${getOptionClassName(currentQuestion.type, option)}`}
+                    className={`py-4 px-3 rounded-2xl border-2 font-bold transition-all relative flex items-center justify-center min-h-[64px] ${stateClass} ${getOptionClassName(currentQuestion.type, option)}`}
                   >
                     {option}
+                    {Icon && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        {Icon}
+                      </div>
+                    )}
                   </button>
                 );
               })}
@@ -428,16 +510,6 @@ export const TestSessionPage: React.FC = () => {
               </motion.p>
             )}
           </AnimatePresence>
-
-          {isAnswered && (
-            <div className="absolute top-4 right-4">
-              {isCorrect ? (
-                <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-              ) : (
-                <XCircle className="w-8 h-8 text-red-500" />
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>

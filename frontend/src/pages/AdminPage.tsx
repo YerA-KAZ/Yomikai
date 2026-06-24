@@ -7,6 +7,7 @@ import {
   type AdminTestQuestion,
   type DictionaryEntry,
   type AdminLesson,
+  type AdminKanji,
 } from '../services/api/adminApi';
 import {
   ALPHABET_QUESTION_TYPES,
@@ -41,6 +42,7 @@ export const AdminPage: React.FC = () => {
   const [isSavingKanji, setIsSavingKanji] = useState(false);
   const [showDatabase, setShowDatabase] = useState(false);
   const [dictionaryItems, setDictionaryItems] = useState<DictionaryEntry[]>([]);
+  const [kanjiItems, setKanjiItems] = useState<AdminKanji[]>([]);
   const [testItems, setTestItems] = useState<AdminTestQuestion[]>([]);
   const [lessons, setLessons] = useState<AdminLesson[]>([]);
   const [dictionaryForm, setDictionaryForm] = useState({
@@ -208,6 +210,9 @@ export const AdminPage: React.FC = () => {
     if (activeTab === 'dictionary') {
       const items = await adminApi.getDictionary();
       setDictionaryItems(items);
+    } else if (activeTab === 'kanji') {
+      const items = await adminApi.getKanji();
+      setKanjiItems(items);
     } else if (activeTab === 'tests') {
       const items = await adminApi.getTests();
       setTestItems(items);
@@ -225,7 +230,7 @@ export const AdminPage: React.FC = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    if (showDatabase && (activeTab === 'dictionary' || activeTab === 'tests')) {
+    if (showDatabase && (activeTab === 'dictionary' || activeTab === 'kanji' || activeTab === 'tests')) {
       loadDatabase().catch(console.error);
     }
   }, [showDatabase, activeTab]);
@@ -265,6 +270,16 @@ export const AdminPage: React.FC = () => {
       setDictionaryItems((items) => items.filter((item) => item.id !== id));
     } catch (err) {
       console.error('Failed to delete dictionary word', err);
+    }
+  };
+
+  const handleDeleteKanji = async (id: string, char: string) => {
+    if (!confirm(`Удалить кандзи «${char}»?`)) return;
+    try {
+      await adminApi.deleteKanji(id);
+      setKanjiItems((items) => items.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error('Failed to delete kanji', err);
     }
   };
 
@@ -566,6 +581,32 @@ export const AdminPage: React.FC = () => {
           </form>
           )
         ) : activeTab === 'kanji' ? (
+          showDatabase ? (
+            <div className="flex flex-col gap-3">
+              {kanjiItems.map((item) => (
+                <div key={item.id} className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-bg border border-border/50 rounded-2xl">
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-2xl font-jp font-black">{item.char}</span>
+                      <span className="text-[10px] bg-primary/10 text-primary font-black px-2 py-0.5 rounded-full">{item.jlptLevel}</span>
+                    </div>
+                    <p className="text-sm text-text-secondary mt-1">{item.meaning}</p>
+                    <p className="text-xs text-text-muted mt-1">Оньёми: {item.onyomi.join(', ')} | Кунъёми: {item.kunyomi.join(', ')}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteKanji(item.id, item.char)}
+                    className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-colors self-start"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {kanjiItems.length === 0 && (
+                <div className="text-center py-8 text-text-secondary">Кандзи в базе пока нет</div>
+              )}
+            </div>
+          ) : (
           <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleKanjiSubmit}>
             <div className="flex flex-col gap-2">
               <label className="text-sm font-bold text-text-secondary">Иероглиф</label>
@@ -758,6 +799,7 @@ export const AdminPage: React.FC = () => {
               </button>
             </div>
           </form>
+          )
         ) : activeTab === 'tests' ? (
           showDatabase ? (
             <div className="flex flex-col gap-3">

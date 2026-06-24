@@ -53,6 +53,21 @@ export interface KanjiCreateInput {
   words?: { word: string; reading: string; meaning: string }[];
 }
 
+export interface AdminKanji {
+  id: string;
+  char: string;
+  meaning: string;
+  onyomi: string[];
+  kunyomi: string[];
+  jlptLevel: string;
+  strokeCount: number;
+  examples: { word: string; reading: string; meaning: string }[];
+  radical: string;
+  learned: boolean;
+  hint: string | null;
+  sortOrder: number;
+}
+
 export interface AdminLesson {
   id: string;
   title: string;
@@ -106,7 +121,9 @@ export const adminApi = {
   addDictionary: (input: DictionaryCreateInput) => apiPost<DictionaryEntry>('/api/admin/dictionary', input),
   deleteDictionary: (id: string) => apiDelete<void>(`/api/admin/dictionary/${id}`),
 
+  getKanji: () => apiGet<AdminKanji[]>('/api/admin/kanji'),
   addKanji: (input: KanjiCreateInput) => apiPost('/api/admin/kanji', input),
+  deleteKanji: (id: string) => apiDelete<void>(`/api/admin/kanji/${id}`),
 
   getLessons: () => apiGet<AdminLesson[]>('/api/admin/lessons'),
   addLesson: (input: LessonCreateInput) => apiPost('/api/admin/lessons', input),

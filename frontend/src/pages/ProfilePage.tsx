@@ -8,6 +8,7 @@ import { ProgressBar } from '../shared/ui/ProgressBar';
 import { Badge } from '../shared/ui/Badge';
 import { Button } from '../shared/ui/Button';
 import { ProgressCard } from '../widgets/Dashboard/ProgressCard';
+import { leaderboardApi, type LeaderboardLeague } from '../services/api/leaderboardApi';
 
 export const ProfilePage: React.FC = () => {
   const { user, stats, fetchUser } = useUserStore();
@@ -15,6 +16,15 @@ export const ProfilePage: React.FC = () => {
   const [editName, setEditName] = useState('');
   const [editAvatar, setEditAvatar] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [league, setLeague] = useState<LeaderboardLeague | null>(null);
+
+  React.useEffect(() => {
+    let mounted = true;
+    leaderboardApi.getWeekly().then(res => {
+      if (mounted) setLeague(res.league);
+    }).catch(console.error);
+    return () => { mounted = false; };
+  }, []);
 
   const openEditModal = () => {
     if (user) {
@@ -109,12 +119,6 @@ export const ProfilePage: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left w-full md:w-auto relative z-10">
             {/* Avatar Container with Animated Ring */}
             <div className="relative group cursor-pointer">
-              {/* Outer rotating ring */}
-              <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-                className="absolute -inset-2 rounded-full border border-dashed border-primary/30 group-hover:border-primary/50 transition-colors"
-              />
               <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-accent p-[3px] shadow-lg shadow-primary/20 transform group-hover:scale-105 transition-transform duration-300 overflow-hidden relative">
                 <div className="w-full h-full rounded-[1.8rem] bg-surface flex items-center justify-center font-black text-4xl text-transparent bg-clip-text bg-gradient-to-br from-primary to-accent font-jp shadow-inner overflow-hidden">
                   {user.avatar.startsWith('/') || user.avatar.startsWith('http') ? (
@@ -124,16 +128,17 @@ export const ProfilePage: React.FC = () => {
                   )}
                 </div>
               </div>
-              <div className="absolute -bottom-2 -right-2 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white w-8 h-8 rounded-xl flex items-center justify-center font-extrabold border-2 border-surface shadow-md text-sm">
-                ✓
-              </div>
             </div>
 
             {/* User Meta */}
             <div className="flex flex-col">
               <div className="flex items-center flex-col md:flex-row gap-2.5">
                 <h2 className="text-3xl font-black drop-shadow-sm">{user.name}</h2>
-                <Badge variant="success" className="font-bold uppercase tracking-wider text-[10px]">Верифицирован</Badge>
+                {league && (
+                  <Badge variant="info" className="bg-amber-500/10 text-amber-500 border-amber-500/20 font-black uppercase tracking-wider text-[10px]">
+                    {league.name}
+                  </Badge>
+                )}
               </div>
               
               <div className="flex items-center gap-2 mt-2 text-xs font-bold text-text-muted justify-center md:justify-start">
@@ -170,14 +175,6 @@ export const ProfilePage: React.FC = () => {
               onClick={openEditModal}
             >
               Редактировать
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs text-text-muted hover:text-text"
-              onClick={() => alert('Настройки аккаунта')}
-            >
-              Настройки аккаунта
             </Button>
           </div>
         </Card>

@@ -7,18 +7,18 @@ const router = Router();
 
 router.use(optionalAuth);
 
-router.get('/kana/hiragana', async (_req, res, next) => {
+router.get('/kana/hiragana', async (req, res, next) => {
   try {
-    const data = await getKanaGroups(prisma, 'hiragana');
+    const data = await getKanaGroups(prisma, 'hiragana', req.authUser?.id);
     res.json(data);
   } catch (error) {
     next(error);
   }
 });
 
-router.get('/kana/katakana', async (_req, res, next) => {
+router.get('/kana/katakana', async (req, res, next) => {
   try {
-    const data = await getKanaGroups(prisma, 'katakana');
+    const data = await getKanaGroups(prisma, 'katakana', req.authUser?.id);
     res.json(data);
   } catch (error) {
     next(error);
@@ -45,7 +45,7 @@ router.post('/kana/learn', async (req, res, next) => {
 router.get('/kanji', async (req, res, next) => {
   try {
     const level = typeof req.query.level === 'string' ? req.query.level : undefined;
-    const data = await getKanjiList(prisma, { level });
+    const data = await getKanjiList(prisma, { level }, req.authUser?.id);
     res.json(data);
   } catch (error) {
     next(error);
@@ -59,13 +59,16 @@ router.post('/kanji/learn', async (req, res, next) => {
       res.status(400).json({ error: 'kanjiId is required' });
       return;
     }
-    await prisma.kanji.update({
-      where: { id: kanjiId },
-      data: { learned: true },
-    });
-    if (req.authUser?.id && xpReward > 0) {
-      const { grantXp } = await import('../services/user.service');
-      await grantXp(prisma, req.authUser.id, xpReward, { source: 'kanji_study' });
+    if (req.authUser?.id) {
+      await prisma.userKanji.upsert({
+        where: { userId_kanjiId: { userId: req.authUser.id, kanjiId } },
+        create: { userId: req.authUser.id, kanjiId },
+        update: {}
+      });
+      if (xpReward > 0) {
+        const { grantXp } = await import('../services/user.service');
+        await grantXp(prisma, req.authUser.id, xpReward, { source: 'kanji_study' });
+      }
     }
     res.json({ success: true });
   } catch (error) {
@@ -103,9 +106,9 @@ router.get('/lessons/:id', async (req, res, next) => {
   }
 });
 
-router.get('/practice', async (_req, res, next) => {
+router.get('/practice', async (req, res, next) => {
   try {
-    const data = await getPracticeSessions(prisma);
+    const data = await getPracticeSessions(prisma, req.authUser?.id);
     res.json(data);
   } catch (error) {
     next(error);

@@ -122,6 +122,26 @@ router.post('/dictionary', async (req, res, next) => {
   }
 });
 
+router.get('/kanji', async (_req, res, next) => {
+  try {
+    const items = await prisma.kanji.findMany({
+      orderBy: { sortOrder: 'asc' },
+    });
+    res.json(items);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/kanji/:id', async (req, res, next) => {
+  try {
+    await prisma.kanji.delete({ where: { id: req.params.id } });
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post('/kanji', async (req, res, next) => {
   try {
     const body = kanjiSchema.parse(req.body);

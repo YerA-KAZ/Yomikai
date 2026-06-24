@@ -130,15 +130,12 @@ export const TestsPage: React.FC = () => {
             >
               <Card
                 hoverable
-                className={`p-5 sm:p-6 flex flex-col min-h-[280px] h-full relative overflow-hidden border bg-surface/60 ${
+                className={`p-5 flex flex-col min-h-[220px] h-full relative group border bg-surface ${
                   lesson.completed 
-                    ? 'border-emerald-500/30 bg-emerald-500/5 shadow-[inset_0_0_15px_rgba(16,185,129,0.05)]' 
+                    ? 'border-emerald-500/30 bg-emerald-500/5' 
                     : 'border-border/15 hover:border-primary/30'
                 }`}
               >
-                {/* Difficulty Gradient Bar */}
-                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${diffGradient} opacity-80`} />
-
                 {/* Visual completion banner */}
                 {lesson.completed && (
                   <motion.div 
@@ -156,17 +153,17 @@ export const TestsPage: React.FC = () => {
                     <Badge variant={getDifficultyBadgeVariant(lesson.difficulty)} className="text-[9px] font-black uppercase tracking-widest">
                       {getDifficultyTranslation(lesson.difficulty)}
                     </Badge>
-                    <Badge variant="default" className="text-[9px] uppercase font-bold tracking-wider">
+                    {/* <Badge variant="default" className="text-[9px] uppercase font-bold tracking-wider">
                       {lesson.questions[0] ? QUESTION_TYPE_LABELS[lesson.questions[0].type] : lesson.type}
-                    </Badge>
+                    </Badge> */}
                   </div>
-                  <h3 className="text-xl font-black mt-2 leading-tight drop-shadow-sm line-clamp-2">{lesson.title}</h3>
-                  <span className="text-xs text-text-secondary line-clamp-3 leading-relaxed mt-1">{lesson.description}</span>
+                  <h3 className="text-lg font-bold mt-2 leading-tight group-hover:text-primary transition-colors line-clamp-2">{lesson.title}</h3>
+                  <span className="text-sm text-text-secondary line-clamp-2 mt-1">{lesson.description}</span>
                 </div>
 
                 {/* Bottom stats & CTA */}
-                <div className="flex flex-col gap-4 mt-auto relative z-10">
-                  <div className="flex items-center justify-between text-xs text-text-secondary font-bold bg-surface/80 border border-border/10 py-2.5 px-3.5 rounded-xl shadow-sm backdrop-blur-sm">
+                <div className="flex flex-col gap-3 mt-auto pt-2">
+                  <div className="flex items-center justify-between text-xs text-text-secondary font-medium">
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5" />
                       <span>~{lesson.estimatedTime} мин</span>
@@ -177,19 +174,17 @@ export const TestsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-1">
-                    <div className="flex w-fit items-center gap-1.5 text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 font-black text-xs px-3 py-1.5 rounded-xl shadow-sm">
-                      <Award className="w-4 h-4" />
-                      <span>+{lesson.xpReward} XP</span>
-                    </div>
-
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-sm font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md">
+                      +{lesson.xpReward} XP
+                    </span>
                     <Button
                       variant={lesson.completed ? 'secondary' : 'primary'}
                       size="sm"
-                      className="w-full sm:w-auto flex items-center gap-1.5 rounded-xl text-xs font-black px-4 shadow-md hover:scale-105"
+                      className="font-bold rounded-xl px-4"
                       onClick={() => navigate(`/tests/${lesson.id}`)}
                     >
-                      {lesson.completed ? 'Пройти снова' : 'Начать тест'} <ArrowRight className="w-4 h-4" />
+                      {lesson.completed ? 'Пройти снова' : 'Перейти'}
                     </Button>
                   </div>
                 </div>

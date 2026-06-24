@@ -112,7 +112,7 @@ function mapQuestion(question: {
   };
 }
 
-export async function getKanaGroups(client: DbClient = prisma, type: 'hiragana' | 'katakana'): Promise<KanaGroupDto[]> {
+export async function getKanaGroups(client: DbClient = prisma, type: 'hiragana' | 'katakana', userId?: string): Promise<KanaGroupDto[]> {
   const groups = await client.kanaGroup.findMany({
     where: { type },
     orderBy: { sortOrder: 'asc' },
@@ -122,6 +122,15 @@ export async function getKanaGroups(client: DbClient = prisma, type: 'hiragana' 
       },
     },
   });
+
+  const learnedMap = new Set<string>();
+  if (userId) {
+    const userKanas = await client.userKana.findMany({
+      where: { userId },
+      select: { kanaId: true }
+    });
+    userKanas.forEach(uk => learnedMap.add(uk.kanaId));
+  }
 
   return groups.map((group) => ({
     id: group.id,
@@ -134,18 +143,27 @@ export async function getKanaGroups(client: DbClient = prisma, type: 'hiragana' 
       type: char.type as KanaCharDto['type'],
       group: char.groupCode,
       examples: Array.isArray(char.examples) ? char.examples as KanaCharDto['examples'] : [],
-      learned: char.learned,
+      learned: userId ? learnedMap.has(char.id) : char.learned,
       strokeOrder: Array.isArray(char.strokeOrder) ? char.strokeOrder.map(String) : undefined,
     })),
   }));
 }
 
-export async function getKanjiList(client: DbClient = prisma, filters: { level?: string } = {}): Promise<KanjiCharDto[]> {
+export async function getKanjiList(client: DbClient = prisma, filters: { level?: string } = {}, userId?: string): Promise<KanjiCharDto[]> {
   const where = filters.level ? { jlptLevel: filters.level } : undefined;
   const items = await client.kanji.findMany({
     where,
     orderBy: { sortOrder: 'asc' },
   });
+
+  const learnedMap = new Set<string>();
+  if (userId) {
+    const userKanjis = await client.userKanji.findMany({
+      where: { userId },
+      select: { kanjiId: true }
+    });
+    userKanjis.forEach(uk => learnedMap.add(uk.kanjiId));
+  }
 
   return items.map((item) => ({
     id: item.id,
@@ -157,7 +175,7 @@ export async function getKanjiList(client: DbClient = prisma, filters: { level?:
     strokeCount: item.strokeCount,
     examples: Array.isArray(item.examples) ? item.examples as KanjiCharDto['examples'] : [],
     radical: item.radical,
-    learned: item.learned,
+    learned: userId ? learnedMap.has(item.id) : item.learned,
     hint: item.hint ?? undefined,
     strokes: Array.isArray(item.strokes) ? item.strokes as KanjiCharDto['strokes'] : undefined,
     words: Array.isArray(item.words) ? item.words as KanjiCharDto['words'] : undefined,
@@ -274,21 +292,32 @@ export async function getLessonById(client: DbClient = prisma, lessonId: string,
   };
 }
 
-export async function getPracticeSessions(client: DbClient = prisma): Promise<PracticeSessionDto[]> {
+export async function getPracticeSessions(client: DbClient = prisma, userId?: string): Promise<PracticeSessionDto[]> {
   const sessions = await client.practiceSession.findMany({
     orderBy: { sortOrder: 'asc' },
   });
 
-  return sessions.map((session) => ({
-    id: session.id,
-    type: session.type as PracticeSessionDto['type'],
-    title: session.title,
-    description: session.description,
-    icon: session.icon,
-    itemCount: session.itemCount,
-    completedCount: session.completedCount,
-    accuracy: session.accuracy,
-  }));
+  const sessionMap = new Map<string, { completedCount: number; accuracy: number }>();
+  if (userId) {
+    const userSessions = await client.userPracticeSession.findMany({
+      where: { userId },
+    });
+    userSessions.forEach(us => sessionMap.set(us.sessionId, { completedCount: us.completedCount, accuracy: us.accuracy }));
+  }
+
+  return sessions.map((session) => {
+    const userSession = sessionMap.get(session.id);
+    return {
+      id: session.id,
+      type: session.type as PracticeSessionDto['type'],
+      title: session.title,
+      description: session.description,
+      icon: session.icon,
+      itemCount: session.itemCount,
+      completedCount: userSession ? userSession.completedCount : session.completedCount,
+      accuracy: userSession ? userSession.accuracy : session.accuracy,
+    };
+  });
 }
 
 export async function getLessonProgressSummary(client: DbClient = prisma, lessonId: string, userId: string) {
@@ -310,13 +339,15 @@ export async function markKanaLearned(
   userId?: string,
   xpReward?: number,
 ): Promise<{ success: true }> {
-  // Update the global kana learned state (since schema doesn't have UserKana table)
-  await client.kanaChar.updateMany({
-    where: { id: { in: kanaIds } },
-    data: { learned: true },
-  });
-
   if (userId) {
+    // Update the user-specific kana learned state
+    await Promise.all(kanaIds.map(kanaId => 
+      client.userKana.upsert({
+        where: { userId_kanaId: { userId, kanaId } },
+        create: { userId, kanaId },
+        update: {}
+      })
+    ));
     // Increase learnedKana count on User
     await client.user.update({
       where: { id: userId },

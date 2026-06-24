@@ -1,73 +1,163 @@
-# React + TypeScript + Vite
+# Yomikai - Приложение для изучения японского языка
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Полнофункциональное веб-приложение для интерактивного изучения японского языка с игровыми элементами, системой прогресса и соревнованиями.
 
-Currently, two official plugins are available:
+## 📋 Возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Изучение алфавитов** - Хирагана и Катакана с интерактивными упражнениями
+- **Каньи** - Изучение иероглифов с примерами и мнемониками
+- **Словарь** - Расширенный каталог слов с произношением
+- **Тесты** - Проверка знаний с системой подсчёта опыта (XP)
+- **Система прогресса** - Отслеживание обучения и уровней сложности
+- **Лидерборд** - Еженедельные соревнования между пользователями
+- **Профиль и настройки** - Персонализация опыта обучения
+- **Виртуальный питомец** - Развитие персонажа через обучение
+- **Тёмная тема** - Комфортный режим для длительного использования
 
-## React Compiler
+## 🏗️ Архитектура проекта
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Структура монорепо
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+ProjectYomikai/
+├── frontend/          # React + TypeScript + Vite
+│   ├── src/
+│   │   ├── pages/     # Страницы приложения
+│   │   ├── features/  # Бизнес-логика компонентов
+│   │   ├── entities/  # Типы данных
+│   │   ├── services/  # API и сервисы
+│   │   ├── shared/    # Общие компоненты и утилиты
+│   │   └── widgets/   # UI-виджеты
+│   └── package.json
+│
+├── backend/           # Express + TypeScript + Prisma
+│   ├── src/
+│   │   ├── routes/    # API маршруты
+│   │   ├── services/  # Бизнес-логика
+│   │   ├── middleware/# Express middleware
+│   │   ├── lib/       # Утилиты
+│   │   └── types/     # TypeScript типы
+│   ├── prisma/        # ORM схема и миграции
+│   └── package.json
+│
+└── README.md          # Этот файл
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Технологический стек
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Frontend
+- **React 19** - UI библиотека
+- **TypeScript** - Типизация кода
+- **Vite** - Быстрая сборка и HMR
+- **TailwindCSS** - Утилитарные стили
+- **Framer Motion** - Анимации
+- **React Router** - Маршрутизация
+- **Zustand** - Состояние приложения
+- **Lucide React** - SVG иконки
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Backend
+- **Express** - Web фреймворк
+- **TypeScript** - Типизация кода
+- **Prisma** - ORM и работа с БД
+- **JWT** - Аутентификация
+- **Bcrypt** - Хеширование паролей
+- **Node Cron** - Запланированные задачи
+- **Zod** - Валидация данных
+
+## 🚀 Установка и запуск
+
+### Предварительные требования
+- Node.js 18+
+- npm или yarn
+- PostgreSQL (для backend)
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev       # Запуск разработочного сервера
+npm run build     # Сборка для продакшена
+npm run lint      # Проверка кода
 ```
+
+### Backend
+
+```bash
+cd backend
+npm install
+npm run dev                    # Запуск в режиме разработки
+npm run build                  # TypeScript компиляция
+npm run prisma:migrate         # Миграция БД
+npm run prisma:seed            # Заполнение тестовыми данными
+npm run prisma:studio          # Prisma Studio
+```
+
+## 🔧 Переменные окружения
+
+### Backend (.env)
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/yomikai_db
+JWT_SECRET=your-secret-key
+PORT=3000
+NODE_ENV=development
+```
+
+### Frontend (если требуется .env)
+```
+VITE_API_URL=http://localhost:3000
+```
+
+## 📦 Основные API эндпоинты
+
+- `POST /auth/register` - Регистрация
+- `POST /auth/login` - Вход
+- `GET /lessons` - Получить уроки
+- `POST /tests/:testId/submit` - Отправить результаты теста
+- `GET /user/profile` - Профиль пользователя
+- `GET /leaderboard` - Лидерборд
+- `GET /content/lessons` - Контент уроков
+- `GET /content/dictionary` - Словарь
+
+## 🗄️ Миграции БД
+
+Проект использует Prisma для управления БД. Основные таблицы:
+
+- **users** - Пользователи системы
+- **lessons** - Уроки и тесты
+- **user_progress** - Прогресс пользователя
+- **questions** - Вопросы тестов
+- **league** - Еженедельные лиги
+
+## 📝 Разработка
+
+### Структура кода
+
+- Используется **Feature-Based** архитектура на frontend
+- Backend следует **Service Layer** паттерну
+- Весь код на **TypeScript** с strict режимом
+- Единые соглашения об именовании
+
+### Коммиты
+
+Рекомендуется использовать структурированные сообщения коммитов:
+
+```
+feat: добавление новой функции
+fix: исправление бага
+docs: обновление документации
+style: форматирование кода
+refactor: рефакторинг без изменения функциональности
+```
+
+## 🐛 Известные проблемы
+
+- Данные о питомце временно отключены на странице профиля
+
+## 📄 Лицензия
+
+Проект в разработке. Лицензия не определена.
+
+## 👨‍💻 Автор
+
+Yomikai Development Team

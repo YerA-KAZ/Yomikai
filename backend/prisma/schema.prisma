@@ -30,6 +30,9 @@ model User {
   achievements        UserAchievement[]
   lessonProgress      UserLessonProgress[]
   testAttempts        TestAttempt[]
+  userKanas           UserKana[]
+  userKanjis          UserKanji[]
+  userPracticeSessions UserPracticeSession[]
 }
 
 model ActivityLog {
@@ -108,6 +111,19 @@ model KanaChar {
   sortOrder   Int      @default(0)
 
   group KanaGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userKanas UserKana[]
+}
+
+model UserKana {
+  id        String   @id @default(uuid())
+  userId    String
+  kanaId    String
+  learnedAt DateTime @default(now())
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kana KanaChar @relation(fields: [kanaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, kanaId])
 }
 
 model Vocabulary {
@@ -137,6 +153,20 @@ model Kanji {
   hint        String?
   strokes     Json?
   words       Json?
+
+  userKanjis UserKanji[]
+}
+
+model UserKanji {
+  id        String   @id @default(uuid())
+  userId    String
+  kanjiId   String
+  learnedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kanji Kanji @relation(fields: [kanjiId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, kanjiId])
 }
 
 model Lesson {
@@ -212,4 +242,20 @@ model PracticeSession {
   completedCount Int
   accuracy       Int
   sortOrder      Int    @default(0)
+
+  userPracticeSessions UserPracticeSession[]
+}
+
+model UserPracticeSession {
+  id             String   @id @default(uuid())
+  userId         String
+  sessionId      String
+  completedCount Int      @default(0)
+  accuracy       Int      @default(0)
+  lastPlayedAt   DateTime @default(now())
+
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session PracticeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sessionId])
 }
