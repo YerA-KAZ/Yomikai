@@ -2,9 +2,8 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Accept VITE_API_URL as build argument
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+# Use environment variable for VITE_API_URL (set by Render)
+ENV VITE_API_URL=${VITE_API_URL:-/api}
 
 # Copy package files
 COPY package*.json ./
