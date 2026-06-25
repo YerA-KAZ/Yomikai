@@ -39,3 +39,14 @@ export function weekDatesEndingToday(today = new Date()): Date[] {
 export function monthDaysAgo(days: number, from = new Date()): Date[] {
   return Array.from({ length: days }, (_, index) => addDays(from, -index));
 }
+
+export function getActiveStreak(user: { streak: number; lastActiveDate: Date | null }): number {
+  if (user.streak === 0 || !user.lastActiveDate) {
+    return 0;
+  }
+  const today = startOfDay(new Date());
+  if (!isSameDay(user.lastActiveDate, today) && !isYesterday(user.lastActiveDate, today)) {
+    return 0;
+  }
+  return user.streak;
+}

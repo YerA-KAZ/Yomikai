@@ -1,7 +1,7 @@
 import type { Prisma, PrismaClient, User as DbUser } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { HttpError } from '../lib/http';
-import { isSameDay, isYesterday, startOfDay, weekDatesEndingToday } from '../lib/dates';
+import { isSameDay, isYesterday, startOfDay, weekDatesEndingToday, getActiveStreak } from '../lib/dates';
 import { getLevelInfo } from './level';
 import { ensureUserLeagueParticipant, incrementWeeklyXp } from './league.service';
 
@@ -252,7 +252,7 @@ export async function buildUserProfile(client: DbClient, userId: string): Promis
     level: getLevelInfo(user.xp).level,
     xp: user.xp,
     xpToNextLevel: getLevelInfo(user.xp).xpToNextLevel,
-    streak: user.streak,
+    streak: getActiveStreak(user),
     longestStreak: user.longestStreak,
     dailyGoal: user.dailyGoal,
     dailyXp,

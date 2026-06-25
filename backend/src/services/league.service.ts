@@ -1,6 +1,7 @@
 import type { League, LeagueParticipant, Prisma, PrismaClient, User } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { getLevelInfo } from './level';
+import { getActiveStreak } from '../lib/dates';
 import { HttpError } from '../lib/http';
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
@@ -42,7 +43,7 @@ function mapLeaderboardEntries(
       avatar: item.user.avatar,
       level,
       xp: item.user.xp,
-      streak: item.user.streak,
+      streak: getActiveStreak(item.user),
       weeklyXp: item.weeklyXp,
       isCurrentUser: item.user.id === currentUserId,
     };

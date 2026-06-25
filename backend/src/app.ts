@@ -6,6 +6,7 @@ import contentRouter from './routes/content';
 import leaderboardRouter from './routes/leaderboard';
 import testsRouter from './routes/tests';
 import adminRouter from './routes/admin';
+import { cronRouter } from './routes/cron';
 import { env } from './lib/env';
 import { errorHandler, notFound } from './middleware/errors';
 
@@ -32,6 +33,7 @@ app.use('/api', contentRouter);
 app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/tests', testsRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/cron', cronRouter);
 
 app.use(notFound);
 app.use(errorHandler);

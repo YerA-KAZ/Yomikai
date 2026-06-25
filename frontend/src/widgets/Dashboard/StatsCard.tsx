@@ -99,7 +99,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({ stats }) => {
 
           {stats.weeklyActivity.map((day, idx) => {
             const heightPercentage = Math.max((day.minutes / maxWeeklyMinutes) * 100, 8);
-            const isToday = idx === 5; // Hardcoded Saturday for mock data
+            const isToday = idx === stats.weeklyActivity.length - 1;
             
             return (
               <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1 z-10">
