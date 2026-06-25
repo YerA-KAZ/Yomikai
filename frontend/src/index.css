@@ -88,24 +88,24 @@
   --theme-glass-border: rgba(255, 255, 255, 0.4);
 }
 
-/* ===== CAT THEME - DARK ===== */
+/* ===== CAT THEME - DARK (Cold Blue Palette) ===== */
 .cat-theme.dark {
-  --theme-primary: #FF8C00;
-  --theme-primary-rgb: 255, 140, 0;
-  --theme-primary-light: #FFB347;
-  --theme-primary-dark: #CC7000;
-  --theme-accent: #FF6B35;
-  --theme-accent-light: #FF9F7A;
-  --theme-surface: #1E1E2E;
-  --theme-surface-hover: #2A2A3E;
-  --theme-bg: #0F0F1A;
-  --theme-bg-secondary: #181828;
-  --theme-text: #F0F0F8;
-  --theme-text-secondary: #B0B0C8;
-  --theme-text-muted: #707088;
-  --theme-border: rgba(255, 140, 0, 0.2);
-  --theme-glass: rgba(30, 30, 46, 0.8);
-  --theme-glass-border: rgba(255, 140, 0, 0.2);
+  --theme-primary: #5B9CF6;
+  --theme-primary-rgb: 91, 156, 246;
+  --theme-primary-light: #93C5FD;
+  --theme-primary-dark: #3B82F6;
+  --theme-accent: #818CF8;
+  --theme-accent-light: #A5B4FC;
+  --theme-surface: #0F172A;
+  --theme-surface-hover: #1E293B;
+  --theme-bg: #060B18;
+  --theme-bg-secondary: #0D1525;
+  --theme-text: #E2E8F0;
+  --theme-text-secondary: #94A3B8;
+  --theme-text-muted: #475569;
+  --theme-border: rgba(91, 156, 246, 0.18);
+  --theme-glass: rgba(15, 23, 42, 0.85);
+  --theme-glass-border: rgba(91, 156, 246, 0.18);
 }
 
 /* ===== DOG THEME - LIGHT ===== */
