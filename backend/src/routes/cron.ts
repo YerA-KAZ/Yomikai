@@ -20,7 +20,7 @@ cronRouter.use((req, res, next) => {
   next();
 });
 
-cronRouter.post('/weekly-update', async (req, res) => {
+cronRouter.all('/weekly-update', async (req, res) => {
   try {
     await runWeeklyLeaguePromotion();
     return res.json({ success: true, message: 'Weekly promotion completed successfully' });
