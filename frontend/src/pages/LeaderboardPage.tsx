@@ -7,7 +7,24 @@ import { leaderboardApi, type LeaderboardEntry, type LeaderboardLeague } from '.
 
 export const LeaderboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'weekly' | 'alltime'>('weekly');
-  const [timeLeft, setTimeLeft] = useState({ days: 1, hours: 14, minutes: 32 });
+
+  // Real countdown to next Sunday 23:59
+  const getTimeUntilSunday = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon ... 6=Sat
+    const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+    const targetDate = new Date(now);
+    targetDate.setDate(now.getDate() + daysUntilSunday);
+    targetDate.setHours(23, 59, 0, 0);
+    const diffMs = targetDate.getTime() - now.getTime();
+    if (diffMs <= 0) return { days: 0, hours: 0, minutes: 0 };
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    return { days, hours, minutes };
+  };
+
+  const [timeLeft, setTimeLeft] = useState(getTimeUntilSunday);
 
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [league, setLeague] = useState<LeaderboardLeague | null>(null);
@@ -43,19 +60,10 @@ export const LeaderboardPage: React.FC = () => {
     return () => { mounted = false; };
   }, [activeTab]);
 
-  // Countdown timer simulation
+  // Update timer every minute
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1 };
-        } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59 };
-        } else if (prev.days > 0) {
-          return { days: prev.days - 1, hours: 23, minutes: 59 };
-        }
-        return prev;
-      });
+      setTimeLeft(getTimeUntilSunday());
     }, 60000);
     return () => clearInterval(interval);
   }, []);

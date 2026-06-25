@@ -15,12 +15,16 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      petTheme: 'cat',
+      petTheme: 'dog',
       colorMode: 'dark',
       setPetTheme: (petTheme) => set({ petTheme }),
-      setColorMode: (colorMode) => set({ colorMode }),
+      setColorMode: (colorMode) =>
+        set({ colorMode, petTheme: colorMode === 'light' ? 'cat' : 'dog' }),
       toggleColorMode: () =>
-        set((state) => ({ colorMode: state.colorMode === 'light' ? 'dark' : 'light' })),
+        set((state) => {
+          const newMode = state.colorMode === 'light' ? 'dark' : 'light';
+          return { colorMode: newMode, petTheme: newMode === 'light' ? 'cat' : 'dog' };
+        }),
     }),
     { name: 'yomikai-theme' }
   )

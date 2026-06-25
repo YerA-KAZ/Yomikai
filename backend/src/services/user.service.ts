@@ -287,6 +287,7 @@ export async function buildUserStats(client: DbClient, userId: string): Promise<
     return {
       day: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'][date.getDay()],
       minutes: log?.minutesSpent ?? 0,
+      xp: log?.xpGained ?? 0,
     };
   });
 

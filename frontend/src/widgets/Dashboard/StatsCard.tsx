@@ -98,7 +98,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({ stats }) => {
           </div>
 
           {stats.weeklyActivity.map((day, idx) => {
-            const heightPercentage = Math.max((day.minutes / maxWeeklyMinutes) * 100, 8);
+            const heightPercentage = day.minutes > 0 ? Math.max((day.minutes / maxWeeklyMinutes) * 100, 4) : 0;
             const isToday = idx === stats.weeklyActivity.length - 1;
             
             return (
@@ -111,12 +111,14 @@ export const StatsCard: React.FC<StatsCardProps> = ({ stats }) => {
                   </span>
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${heightPercentage}%` }}
+                    animate={{ height: day.minutes > 0 ? `${heightPercentage}%` : '2px' }}
                     transition={{ delay: idx * 0.05, duration: 0.6, ease: 'easeOut', type: 'spring', stiffness: 100 }}
                     className={`w-6 sm:w-8 rounded-t-md rounded-b-sm shadow-[0_-2px_10px_rgba(var(--theme-primary-rgb),0.1)] transition-colors cursor-pointer hover:brightness-110 ${
-                      isToday 
-                        ? 'bg-gradient-to-t from-primary/80 to-accent' 
-                        : 'bg-primary/20 hover:bg-primary/40'
+                      day.minutes === 0
+                        ? 'bg-border/20'
+                        : isToday 
+                          ? 'bg-gradient-to-t from-primary/80 to-accent' 
+                          : 'bg-primary/30 hover:bg-primary/50'
                     }`}
                   />
                 </div>

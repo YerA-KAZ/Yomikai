@@ -1,5 +1,6 @@
 import type { KanaGroup } from '../../entities/kana/types';
 import type { PracticeProgress } from './types';
+import { useUserStore } from '../user/useUserStore';
 
 export function shuffle<T>(array: T[]): T[] {
   const copy = [...array];
@@ -34,7 +35,8 @@ const STORAGE_PREFIX = 'yomikai-practice-';
 
 export function loadProgress(sessionId: string): PracticeProgress {
   try {
-    const raw = localStorage.getItem(`${STORAGE_PREFIX}${sessionId}`);
+    const userId = useUserStore.getState().user?.id || 'guest';
+    const raw = localStorage.getItem(`${STORAGE_PREFIX}${userId}-${sessionId}`);
     if (raw) return JSON.parse(raw) as PracticeProgress;
   } catch {
     /* ignore */
@@ -43,7 +45,8 @@ export function loadProgress(sessionId: string): PracticeProgress {
 }
 
 export function saveProgress(sessionId: string, progress: PracticeProgress): void {
-  localStorage.setItem(`${STORAGE_PREFIX}${sessionId}`, JSON.stringify(progress));
+  const userId = useUserStore.getState().user?.id || 'guest';
+  localStorage.setItem(`${STORAGE_PREFIX}${userId}-${sessionId}`, JSON.stringify(progress));
 }
 
 export function getProgressStats(progress: PracticeProgress) {

@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Hand } from 'lucide-react';
 import { Card } from '../../shared/ui/Card';
 
 interface WelcomeCardProps {
@@ -53,15 +52,8 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({ userName, level }) => 
 
       <div className="flex flex-col gap-2 relative z-10">
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl md:text-3xl font-extrabold flex items-center gap-2">
+          <h2 className="text-2xl md:text-3xl font-extrabold">
             {greeting}, {userName}!
-            <motion.span
-              animate={{ rotate: [0, 20, -10, 20, 0] }}
-              transition={{ repeat: Infinity, repeatDelay: 2, duration: 1.5 }}
-              className="inline-block origin-bottom-right"
-            >
-              <Hand className="w-6 h-6 md:w-8 md:h-8 fill-amber-200 text-amber-200" />
-            </motion.span>
           </h2>
         </div>
         <p className="text-white/80 text-sm md:text-base font-medium max-w-sm">

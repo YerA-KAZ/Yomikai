@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sun, Moon, Info, Settings, ShieldCheck, Code, Cat, Dog } from 'lucide-react';
+import { Sun, Moon, Settings, Cat, Dog } from 'lucide-react';
 import { useThemeStore } from '../features/theme/useThemeStore';
 import { Card } from '../shared/ui/Card';
 
@@ -171,42 +171,6 @@ export const SettingsPage: React.FC = () => {
           </Card>
         </motion.div>
 
-        {/* SECTION 3: SYSTEM INFO */}
-        <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <h3 className="text-sm font-extrabold text-text-secondary uppercase tracking-widest bg-surface/80 px-3 py-1 rounded-lg border border-border/10 inline-block shadow-sm">О приложении</h3>
-            <div className="h-px flex-1 bg-gradient-to-r from-border/30 to-transparent" />
-          </div>
-          <Card className="p-6 flex flex-col gap-5 border-border/15 bg-surface/60">
-            <div className="flex items-center gap-4 border-b border-border/10 pb-4">
-              <div className="bg-primary/10 p-2.5 rounded-xl border border-primary/20 shadow-sm">
-                 <Info className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-base font-black text-text tracking-wide">Yomikai</span>
-                <span className="text-xs text-text-muted font-bold tracking-widest uppercase mt-0.5">Версия 1.0.0 (Beta)</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <button className="flex justify-between items-center py-2 px-3 hover:bg-surface rounded-xl transition-colors group">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                  <span className="text-sm font-bold text-text-secondary group-hover:text-text">Лицензия и Конфиденциальность</span>
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-primary">Подробнее</span>
-              </button>
-
-              <button className="flex justify-between items-center py-2 px-3 hover:bg-surface rounded-xl transition-colors group">
-                <div className="flex items-center gap-3">
-                  <Code className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm font-bold text-text-secondary group-hover:text-text">Открытый исходный код</span>
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-primary">GitHub</span>
-              </button>
-            </div>
-          </Card>
-        </motion.div>
       </motion.div>
     </div>
   );
