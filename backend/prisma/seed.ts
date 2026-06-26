@@ -63,7 +63,7 @@ function buildAdminActivityLogs(userId: string) {
   const minutesPattern = [
     ...Array.from({ length: 37 }, () => 43),
     34,
-    ...mockUserStats.weeklyActivity.map((day:any) => day.minutes),
+    ...mockUserStats.weeklyActivity.map((day) => day.minutes),
   ];
 
   const xpPattern = [
@@ -180,7 +180,7 @@ async function seedKana() {
   });
 
   const kanaChars = kanaGroups.flatMap((group, groupIndex) =>
-    group.chars.map((char:any, charIndex:any) => ({
+    group.chars.map((char, charIndex) => ({
       id: char.id,
       groupId: group.id,
       char: char.char,
@@ -248,7 +248,7 @@ async function seedLessons() {
   });
 
   const questions = mockLessons.flatMap((lesson) =>
-    lesson.questions.map((question:any, index:any) => ({
+    lesson.questions.map((question, index) => ({
       id: question.id,
       lessonId: lesson.id,
       type: question.type,
@@ -305,7 +305,7 @@ async function seedUsers() {
       learnedKana: mockUser.learnedKana,
       learnedKanji: mockUser.learnedKanji,
       learnedWords: mockUser.learnedWords,
-      recentLessons: mockUser.recentLessons.map((lesson:any, index:any) => ({
+      recentLessons: mockUser.recentLessons.map((lesson, index) => ({
         ...lesson,
         lastAccessed: addDays(startOfDay(new Date()), -(index + 1)).toISOString(),
       })),
@@ -321,7 +321,7 @@ async function seedUsers() {
   });
 
   await prisma.userAchievement.createMany({
-    data: mockUser.achievements.map((achievement:any) => ({
+    data: mockUser.achievements.map((achievement) => ({
       userId: admin.id,
       achievementId: achievement.id,
       progress: achievement.progress,
@@ -330,7 +330,7 @@ async function seedUsers() {
   });
 
   await prisma.userLessonProgress.createMany({
-    data: mockUser.recentLessons.slice(0, mockLessons.length).map((lesson:any, index:any) => ({
+    data: mockUser.recentLessons.slice(0, mockLessons.length).map((lesson, index) => ({
       userId: admin.id,
       lessonId: mockLessons[index].id,
       progress: lesson.progress,
