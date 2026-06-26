@@ -52,16 +52,16 @@ export const DogPet: React.FC<DogPetProps> = ({ isPetting, isHovering }) => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          {/* Golden/Beige gradients */}
+          {/* Cool Steel-Blue gradients */}
           <linearGradient id="dogBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#EAD2AC" />
-            <stop offset="60%" stopColor="#D4A574" />
-            <stop offset="100%" stopColor="#B37D4A" />
+            <stop offset="0%" stopColor="#C5D8EE" />
+            <stop offset="60%" stopColor="#8BAED4" />
+            <stop offset="100%" stopColor="#5A84B0" />
           </linearGradient>
-          {/* Dark Brown for Ears */}
+          {/* Deep Indigo-Blue for Ears */}
           <linearGradient id="dogEarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#A0522D" />
-            <stop offset="100%" stopColor="#5C2E0B" />
+            <stop offset="0%" stopColor="#4A6FA8" />
+            <stop offset="100%" stopColor="#243560" />
           </linearGradient>
         </defs>
 
@@ -69,7 +69,7 @@ export const DogPet: React.FC<DogPetProps> = ({ isPetting, isHovering }) => {
         <motion.path
           d="M 140 170 Q 175 160 185 130 Q 187 122 178 126 Q 168 130 148 162"
           fill="url(#dogBodyGrad)"
-          stroke="#B37D4A"
+          stroke="#5A84B0"
           strokeWidth="1.5"
           style={{ transformOrigin: '140px 170px' }}
           animate={{ rotate: [-tailWagAngle, tailWagAngle, -tailWagAngle] }}
@@ -84,7 +84,7 @@ export const DogPet: React.FC<DogPetProps> = ({ isPetting, isHovering }) => {
         <path
           d="M 60 180 C 60 130, 140 130, 140 180 C 140 195, 60 195, 60 180 Z"
           fill="url(#dogBodyGrad)"
-          stroke="#B37D4A"
+          stroke="#5A84B0"
           strokeWidth="2"
         />
 
@@ -94,7 +94,7 @@ export const DogPet: React.FC<DogPetProps> = ({ isPetting, isHovering }) => {
         {/* Collar & Bone Tag */}
         <path
           d="M 72 138 Q 100 150 128 138"
-          stroke="#6BB5E0"
+          stroke="#3A5FA8"
           strokeWidth="4"
           fill="none"
           strokeLinecap="round"
@@ -113,7 +113,7 @@ export const DogPet: React.FC<DogPetProps> = ({ isPetting, isHovering }) => {
         <path
           d="M 78 180 C 78 168, 92 168, 92 180 C 92 185, 78 185, 78 180 Z"
           fill="url(#dogBodyGrad)"
-          stroke="#B37D4A"
+          stroke="#5A84B0"
           strokeWidth="1.5"
         />
 
@@ -121,7 +121,7 @@ export const DogPet: React.FC<DogPetProps> = ({ isPetting, isHovering }) => {
         <path
           d="M 108 180 C 108 168, 122 168, 122 180 C 122 185, 108 185, 108 180 Z"
           fill="url(#dogBodyGrad)"
-          stroke="#B37D4A"
+          stroke="#5A84B0"
           strokeWidth="1.5"
         />
 
@@ -161,7 +161,7 @@ export const DogPet: React.FC<DogPetProps> = ({ isPetting, isHovering }) => {
             rx="52"
             ry="42"
             fill="url(#dogBodyGrad)"
-            stroke="#B37D4A"
+            stroke="#5A84B0"
             strokeWidth="2"
           />
 
@@ -215,7 +215,7 @@ export const DogPet: React.FC<DogPetProps> = ({ isPetting, isHovering }) => {
           )}
 
           {/* Nose */}
-          <ellipse cx="100" cy="98" rx="7" ry="5" fill="#1A1A2E" />
+          <ellipse cx="100" cy="98" rx="7" ry="5" fill="#1A2E50" />
 
           {/* Mouth & Tongue */}
           {isPetting ? (

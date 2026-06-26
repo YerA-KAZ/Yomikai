@@ -110,42 +110,42 @@
 
 /* ===== DOG THEME - LIGHT ===== */
 .dog-theme.light {
-  --theme-primary: #6BB5E0;
-  --theme-primary-rgb: 107, 181, 224;
-  --theme-primary-light: #A3D5F0;
-  --theme-primary-dark: #4A9BC8;
-  --theme-accent: #D4A574;
-  --theme-accent-light: #E8C9A8;
-  --theme-surface: #FFFFFF;
-  --theme-surface-hover: #F0F8FF;
-  --theme-bg: #F5FAFF;
-  --theme-bg-secondary: #EAF4FE;
-  --theme-text: #1A2E3E;
-  --theme-text-secondary: #4A6A7A;
-  --theme-text-muted: #8AAABB;
-  --theme-border: rgba(107, 181, 224, 0.15);
-  --theme-glass: rgba(255, 255, 255, 0.7);
-  --theme-glass-border: rgba(255, 255, 255, 0.4);
+  --theme-primary: #5BA8D8;
+  --theme-primary-rgb: 91, 168, 216;
+  --theme-primary-light: #8FCAE8;
+  --theme-primary-dark: #3A8AB8;
+  --theme-accent: #7B9FD4;
+  --theme-accent-light: #A8C4E8;
+  --theme-surface: #F8FBFF;
+  --theme-surface-hover: #ECF4FB;
+  --theme-bg: #EEF6FF;
+  --theme-bg-secondary: #E2EFFA;
+  --theme-text: #12243A;
+  --theme-text-secondary: #3A5A72;
+  --theme-text-muted: #7A9BB0;
+  --theme-border: rgba(91, 168, 216, 0.18);
+  --theme-glass: rgba(255, 255, 255, 0.72);
+  --theme-glass-border: rgba(255, 255, 255, 0.45);
 }
 
 /* ===== DOG THEME - DARK ===== */
 .dog-theme.dark {
-  --theme-primary: #6BB5E0;
-  --theme-primary-rgb: 107, 181, 224;
-  --theme-primary-light: #A3D5F0;
-  --theme-primary-dark: #4A9BC8;
-  --theme-accent: #D4A574;
-  --theme-accent-light: #E8C9A8;
-  --theme-surface: #1A2535;
-  --theme-surface-hover: #243545;
-  --theme-bg: #0D1520;
-  --theme-bg-secondary: #142030;
-  --theme-text: #E8F0F8;
-  --theme-text-secondary: #A8C0D0;
-  --theme-text-muted: #688898;
-  --theme-border: rgba(107, 181, 224, 0.2);
-  --theme-glass: rgba(26, 37, 53, 0.8);
-  --theme-glass-border: rgba(107, 181, 224, 0.2);
+  --theme-primary: #5BA8D8;
+  --theme-primary-rgb: 91, 168, 216;
+  --theme-primary-light: #8FCAE8;
+  --theme-primary-dark: #3A8AB8;
+  --theme-accent: #7B9FD4;
+  --theme-accent-light: #A8C4E8;
+  --theme-surface: #111D2E;
+  --theme-surface-hover: #192840;
+  --theme-bg: #090F1C;
+  --theme-bg-secondary: #101A2C;
+  --theme-text: #D8EAF8;
+  --theme-text-secondary: #89AEC8;
+  --theme-text-muted: #4E7088;
+  --theme-border: rgba(91, 168, 216, 0.22);
+  --theme-glass: rgba(17, 29, 46, 0.82);
+  --theme-glass-border: rgba(91, 168, 216, 0.22);
 }
 
 /* ===== BASE STYLES ===== */
